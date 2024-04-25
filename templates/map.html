@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Marine Traffic Overview</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+        .custom-div-icon {
+            background-color:  #CFFF04;
+            border-radius: 50%;
+            width: 3px;
+            height: 3px;
+            box-shadow: 0 0 3px  #CFFF04;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="http://ewoken.github.io/Leaflet.MovingMarker/MovingMarker.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var map = L.map('map', {
+                center: [23.6978, 120.9605],
+                zoom: 3
+            });
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &amp; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd', maxZoom: 20
+            }).addTo(map);
+<!--L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.{format}', {-->
+<!--	attribution: 'Imagery provided by services from the Global Imagery Browse Services (GIBS), operated by the NASA/GSFC/Earth Science Data and Information System (<a href="https://earthdata.nasa.gov">ESDIS</a>) with funding provided by NASA/HQ.',-->
+<!--	bounds: [[-85.0511287776, -179.999999975], [85.0511287776, 179.999999975]],-->
+<!--	minZoom: 1,-->
+<!--	maxZoom: 8,-->
+<!--	format: 'jpg',-->
+<!--	time: '',-->
+<!--	tilematrixset: 'GoogleMapsCompatible_Level'-->
+<!--}).addTo(map);;-->
+
+            // Define feature groups
+                var arrivingShips = L.featureGroup();
+                var departingShips = L.featureGroup();
+
+
+            // Define the start and end points of arriving ships
+            var startLatLng_arriving = L.latLng(-20.0, 118.0);
+            var endLatLng_arriving = L.latLng(22.5529, 120.2851);
+
+            // Create the moving marker using the plugin with a yellow circle icon
+            var movingMarker = L.Marker.movingMarker([startLatLng_arriving, endLatLng_arriving], [5000], {
+                autostart: true,
+                icon: L.divIcon({
+                    className: 'custom-div-icon',
+                    html: "<div style='background-color: #ffff00; border-radius: 50%; width: 3px; height: 3px; box-shadow: 0 0 3px #ffff00;'></div>",
+                    iconSize: [0.5, 0.5],
+                    iconAnchor: [0.5, 0.5]
+                })
+            }).addTo(arrivingShips);
+
+            // Define the start and end points of arriving ships
+            var startLatLng_departing = L.latLng(35.0, 129.0);
+            var endLatLng_departing = L.latLng(22.5529, 120.2851);
+
+            // Create the moving marker using the plugin with a yellow circle icon
+            var movingMarker = L.Marker.movingMarker([startLatLng_departing, endLatLng_departing], [5000], {
+                autostart: true,
+                icon: L.divIcon({
+                    className: 'custom-div-icon',
+                    html: "<div style='background-color: #ffff00; border-radius: 50%; width: 3px; height: 3px; box-shadow: 0 0 3px #ffff00;'></div>",
+                    iconSize: [0.5, 0.5],
+                    iconAnchor: [0.5, 0.5]
+                })
+            }).addTo(arrivingShips);
+
+            // Add the feature groups to the map
+                arrivingShips.addTo(map);
+                departingShips.addTo(map);
+
+            // Add layer control to the map
+                L.control.layers(null, {
+                    'Arriving Ships': arrivingShips,
+                    'Departing Ships': departingShips
+                }, {
+                    collapsed: false
+                }).addTo(map);
+
+
+
+            // Event listener when the moving marker stops
+<!--            movingMarker.on('end', function() {-->
+<!--                map.removeLayer(movingMarker);-->
+<!--            });-->
+        });
+    </script>
+</body>
+</html>
