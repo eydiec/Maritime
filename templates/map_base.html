@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_e9ccfe7c1cecbbdeada42cd8679fb867 {
+                #map_4f5faf4e9523d652d8e4acd3d6e32d79 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -39,14 +39,14 @@
 <body>
     
     
-            <div class="folium-map" id="map_e9ccfe7c1cecbbdeada42cd8679fb867" ></div>
+            <div class="folium-map" id="map_4f5faf4e9523d652d8e4acd3d6e32d79" ></div>
         
 </body>
 <script>
     
     
-            var map_e9ccfe7c1cecbbdeada42cd8679fb867 = L.map(
-                "map_e9ccfe7c1cecbbdeada42cd8679fb867",
+            var map_4f5faf4e9523d652d8e4acd3d6e32d79 = L.map(
+                "map_4f5faf4e9523d652d8e4acd3d6e32d79",
                 {
                     center: [23.6978, 120.9605],
                     crs: L.CRS.EPSG3857,
@@ -60,57 +60,57 @@
 
         
     
-            var tile_layer_864527b250fa7bef11bc213c39f4a0b6 = L.tileLayer(
+            var tile_layer_ac3d6edac03afacb9af62a0ba432a330 = L.tileLayer(
                 "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
                 {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e", "detectRetina": false, "maxNativeZoom": 20, "maxZoom": 20, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abcd", "tms": false}
             );
         
     
-            tile_layer_864527b250fa7bef11bc213c39f4a0b6.addTo(map_e9ccfe7c1cecbbdeada42cd8679fb867);
+            tile_layer_ac3d6edac03afacb9af62a0ba432a330.addTo(map_4f5faf4e9523d652d8e4acd3d6e32d79);
         
     
-            var feature_group_7bb703fae030a8d3e383adc5fa19f368 = L.featureGroup(
+            var feature_group_31d7f695bd2214226a42f4fea4b114f9 = L.featureGroup(
                 {}
             );
         
     
-            var circle_marker_6946016cf3b14490b6932768e2082b96 = L.circleMarker(
+            var circle_marker_31370c32adef9e92c56c481580a3299f = L.circleMarker(
                 [-20.0, 118.0],
                 {"bubblingMouseEvents": true, "color": "yellow", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 3}
-            ).addTo(feature_group_7bb703fae030a8d3e383adc5fa19f368);
+            ).addTo(feature_group_31d7f695bd2214226a42f4fea4b114f9);
         
     
-            feature_group_7bb703fae030a8d3e383adc5fa19f368.addTo(map_e9ccfe7c1cecbbdeada42cd8679fb867);
+            feature_group_31d7f695bd2214226a42f4fea4b114f9.addTo(map_4f5faf4e9523d652d8e4acd3d6e32d79);
         
     
-            var feature_group_cc4962a217b083e87c51f3505494019a = L.featureGroup(
+            var feature_group_2c02742c5063e4882fdbeb53f29b8771 = L.featureGroup(
                 {}
             );
         
     
-            var circle_marker_65c51d7faceac0aa0689257b284fbcc9 = L.circleMarker(
+            var circle_marker_c2a7e0b4cf49b34232e7ea043087b7b5 = L.circleMarker(
                 [35.0, 129.0],
                 {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 0.5, "stroke": true, "weight": 3}
-            ).addTo(feature_group_cc4962a217b083e87c51f3505494019a);
+            ).addTo(feature_group_2c02742c5063e4882fdbeb53f29b8771);
         
     
-            feature_group_cc4962a217b083e87c51f3505494019a.addTo(map_e9ccfe7c1cecbbdeada42cd8679fb867);
+            feature_group_2c02742c5063e4882fdbeb53f29b8771.addTo(map_4f5faf4e9523d652d8e4acd3d6e32d79);
         
     
-            var layer_control_e84145acc1bdf60bdf7efcad71ad2fbb_layers = {
+            var layer_control_43057b039b48b563983f98e87fd60ff1_layers = {
                 base_layers : {
-                    "cartodbdarkmatter" : tile_layer_864527b250fa7bef11bc213c39f4a0b6,
+                    "cartodbdarkmatter" : tile_layer_ac3d6edac03afacb9af62a0ba432a330,
                 },
                 overlays :  {
-                    "Arriving Ships" : feature_group_7bb703fae030a8d3e383adc5fa19f368,
-                    "Departing Ships" : feature_group_cc4962a217b083e87c51f3505494019a,
+                    "Arriving Ships" : feature_group_31d7f695bd2214226a42f4fea4b114f9,
+                    "Departing Ships" : feature_group_2c02742c5063e4882fdbeb53f29b8771,
                 },
             };
-            let layer_control_e84145acc1bdf60bdf7efcad71ad2fbb = L.control.layers(
-                layer_control_e84145acc1bdf60bdf7efcad71ad2fbb_layers.base_layers,
-                layer_control_e84145acc1bdf60bdf7efcad71ad2fbb_layers.overlays,
+            let layer_control_43057b039b48b563983f98e87fd60ff1 = L.control.layers(
+                layer_control_43057b039b48b563983f98e87fd60ff1_layers.base_layers,
+                layer_control_43057b039b48b563983f98e87fd60ff1_layers.overlays,
                 {"autoZIndex": true, "collapsed": true, "position": "topright"}
-            ).addTo(map_e9ccfe7c1cecbbdeada42cd8679fb867);
+            ).addTo(map_4f5faf4e9523d652d8e4acd3d6e32d79);
 
         
 </script>

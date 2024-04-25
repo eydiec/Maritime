@@ -21,12 +21,12 @@ app.secret_key = os.getenv('SECRET_KEY')
 def home():
     grafana_api_token = os.getenv('GRAFANA_TOKEN')
     # logging.info(f"Using Grafana API Token: {grafana_api_token}")
-    graph1 = WCI_and_TEU()
-    graph2 = FBX_and_TEU()
-    graph3 = BDI_and_Cargo()
-    graph4, graph5 = stock_and_TEU_and_cargo()
-    return render_template('marine.html', grafana_api_token=grafana_api_token, graph1=graph1, graph2=graph2,
-                           graph3=graph3, graph4=graph4, graph5=graph5)
+    # graph1 = WCI_and_TEU()
+    # graph2 = FBX_and_TEU()
+    # graph3 = BDI_and_Cargo()
+    # graph4, graph5 = stock_and_TEU_and_cargo()
+    return render_template('marine.html', grafana_api_token=grafana_api_token)
+    # , graph1=graph1, graph2=graph2,graph3=graph3, graph4=graph4, graph5=graph5)
 
 
 @app.route("/map")

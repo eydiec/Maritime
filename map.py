@@ -14,6 +14,7 @@ def ship_map():
         'end': {'name': 'TWKHH', 'latitude': 22.5529, 'longitude': 120.2851}
     }
 
+
     arriving_group = folium.FeatureGroup(name='Arriving Ships', show=True)
     departing_group = folium.FeatureGroup(name='Departing Ships', show=True)
 
