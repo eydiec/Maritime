@@ -39,7 +39,7 @@ def lambda_handler(event, context):
             date = item[0]
             value = float(item[1])
             print(date, value)
-            point = Point('Index').tag("Index", filename).field("value", value).time(datetime.datetime.strptime(date, '%Y-%m-%d'), WritePrecision.NS),
+            point = Point('Index').tag("Index", filename).field("value", value).time(datetime.strptime(date, '%Y-%m-%d'), WritePrecision.NS),
             points.append(point)
         write_api.write(bucket=influx_bucket, org=org, record=points)
     else:
@@ -57,7 +57,7 @@ def lambda_handler(event, context):
 
                 if '年' in row[0]:
                     year = int(row[0].split('年')[0]) + 1911
-                    point = Point('貨物吞吐量').tag("port", filename.split('吞吐量')[0]).field("total", row[1]).time(datetime.datetime.strptime(str(year), '%Y'),
+                    point = Point('貨物吞吐量').tag("port", filename.split('吞吐量')[0]).field("total", row[1]).time(datetime.strptime(str(year), '%Y'),
                                                                        WritePrecision.NS),
                     write_api.write(bucket=influx_bucket, record=point)
             elif filename.endswith('船舶'):

@@ -22,55 +22,185 @@
 
     <div id="port" class="tabcontent">
       <h3>Port Quickview</h3>
-                <iframe id="grafanaDashboard2" src="http://13.237.180.170:3000/d/adiii827jcnb4e/marine-time?orgId=1&1609430400000&to=1713424678805&theme=light&kiosk&token={{ grafana_api_token }}" width="100%" height="900" frameborder="0"></iframe>
+        <iframe id="grafanaDashboard2" src="http://13.237.180.170:3000/d/adiii827jcnb4e/marine-time?orgId=1&1609430400000&to=1713424678805&theme=light&kiosk=tv&token={{ grafana_api_token }}" width="100%" height="900" frameborder="0"></iframe>
 
     </div>
     <div id="analyze" class="tabcontent">
       <h3>4大商港指標與國際指數分析</h3>
-</div>
-        <h5>WCI Index vs. TEU</h5>
+
         <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph1 }}">
+            <h5>WCI Index vs. TEU</h5>
+            <div class="content-row">
+                <div class="left-side">
+                    <div class="image-item">
+                        <img src="data:image/png;base64,{{ graph1 }}" alt="WCI Index vs. TEU">
+                    </div>
+                    <div class="correlation-info">
+                        <p>Pearson Correlation: -0.52<br>
+                            負相關意味著當WCI指數上升（運輸成本上升）時，TEU指標（貨運量）會有下降的趨勢。</p>
+                    </div>
+                </div>
+                <div class="description-item">
+                    <p class="insight"> Business Insight</p>
+                    <div class=" full-part">
+                        <p class="full" >
+                            WCI指數（World Container Index，世界集裝箱指數）基於集裝箱運輸成本的指數，反映航運市場的供需情況和運輸成本變化。<br>
+                            TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br>
+                            分析顯示當WCI指數升高，顯示運輸成本壓力上升，企業對於全球運輸策略的靈活調整更顯重要，TEU的減少則顯示正在縮減的運輸規模<br>
+                            運輸成本的增加會抑制貨運需求，因此企業在高WCI時期，應評估庫存策略，並深入分析其他成本變動趨勢，尋找更多cost saving機會，如透過長期合約方式與供應鏈上下游合作，共同承擔成本上升帶來的衝擊，打造雙贏局面。<br>
+                            綜合WCI指數與TEU數據可以動態提供市場變化，企業得以採取前瞻性決策，即時優化供應鏈流程，在全球市場中更具競爭力。<br><br>
+
+
+
+                        </p>
+                        <button class="read-more-btn">⛴﹏Read More﹏⛴</button>
+                    </div>
+                </div>
+
             </div>
-            <div class="description-item">
-            <p>Description ...</p>
-
+            <div class=" source-row">
+                <p class="source">source: 航港局 iMarine</p>
+            </div>
         </div>
 
-        <h5>FBX Index vs. TEU</h5>
+
         <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph2 }}">
-            </div><div class="description-item">
-            <p>Description ...</p>
+            <h5>FBX Index vs. TEU</h5>
+            <div class="content-row">
+                <div class="left-side">
+                    <div class="image-item">
+                        <img src="data:image/png;base64,{{ graph2 }}" alt="FBX Index vs. TEU">
+                    </div>
+                    <div class="correlation-info">
+                        <p>Pearson Correlation: 0.29<br>
+                            正相關意味著當FBX指數上升（運費指數提高）時，TEU指標（貨櫃量）會有增加的趨勢。然而相關性不強，代表還有其他因素影響著TEU。</p>
+                    </div>
+                </div>
+                <div class="description-item">
+                    <p class="insight"> Business Insight</p>
+                    <div class=" full-part">
+                        <p class="full" >
+                            FBX指數（Freightos Baltic Index，貨運指數）反映即時運費市場的動態。<br>
+                            TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br>
+                            分析顯示，當貨運指數上升時，貨櫃運輸量也隨之增加，意味著全球貿易活動的擴展，經濟擴張和消費市場的開發對運輸量的需求，即使運費上漲，市場對運輸量能的需求仍持續增長。<br>
+                            這樣的情況顯示運輸業對需求變化的高度敏感性及運輸服務的價值，企業可以通過提高運輸效率提供更多增值服務，客戶則願意支付更高的價格換取可靠的運輸選項。<br>
+                            貨櫃運輸量與FBX指數分析，可以更靈敏地反映市場變化，揭示供需狀況，有助於進行市場趨勢分析和需求預測，並關注運輸效率和成本效益之間的平衡。<br>
+                            FBX指數與前述WCI指數皆提供有關航運成本的重要訊息，但FBX指數涵蓋更多航線，提供更全面、更即時的全球運輸成本數據。<br>
+                            此外，FBX指數的上升也可視為經濟活動增加的指標，為了適應市場環境的快速變化，企業需密切關注相關指標，並調整中長期的策略規劃。<br>
+
+                        </p>
+                        <button class="read-more-btn">⛴﹏Read More﹏⛴</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class=" source-row">
+                <p class="source">source: 航港局 iMarine</p>
+            </div>
         </div>
 
-        <h5>BDI Index vs. Dry Material</h5>
+
+         <div class="image-container">
+            <h5>BDI Index vs. Dry Material Cargo</h5>
+            <div class="content-row">
+                <div class="left-side">
+                    <div class="image-item">
+                        <img src="data:image/png;base64,{{ graph3 }}" alt="BDI Index vs. Dry Material Cargo">
+                    </div>
+                    <div class="correlation-info">
+                        <p>Pearson Correlation: 0.61<br>
+                            中等正相關意味著當台灣乾散貨運輸量上升時，BDI指標（航運成本）也相應提高的趨勢。</p>
+                    </div>
+                </div>
+                <div class="description-item">
+                    <p class="insight"> Business Insight</p>
+                    <div class=" full-part">
+                        <p class="full" >
+                            BDI指數（Baltic Dry Index，波羅的海綜合航運指數）通過衡量特定航線上運輸乾散貨的運費變化，反映全球船運市場的供需狀況。由於它是根據實際運費計算出來的，因此被視為全球經濟健康狀況的前瞻性指標。<br>
+                            Dry Material Cargo（台灣乾散貨運輸量)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br>
+                            分析顯示正相關的趨勢可能表明市場對原物料的需求正在增長，通常與經濟擴張和建設活動增多有關。<br>
+                            此外，上升的乾散貨運輸量指向台灣經濟活動的加快，在運輸成本的上漲時期，仍然吸收成本推動更多的運輸活動，特別是原物料需求度高的產業，需要進行綜合的市場分析，不僅關注當前的成本和需求，還要考慮長期的經濟發展趨勢、政策變化以及潛在的市場風險。<br>
+                            穩定上升的BDI指數為航運企業提供了增加投資的信心，可能是擴大船隊、提升運輸效率或調整貨運策略的信號。然而對於原物料密集產業，這可能意味著生產成本上升，需要通過有效策略維持企業利潤，有助於企業預測市場動態並做出及時反應。<br>
+
+
+                        </p>
+                        <button class="read-more-btn">⛴﹏Read More﹏⛴</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class=" source-row">
+                <p class="source">source: 航港局 iMarine</p>
+            </div>
+        </div>
+
         <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph3 }}">
-            </div><div class="description-item">
-            <p>Description ...</p>
+            <h5>Stock Index vs. Container Throughput</h5>
+            <div class="content-row">
+                <div class="left-side">
+                    <div class="image-item">
+                        <img src="data:image/png;base64,{{ graph4 }}" alt="Stock Index vs. Container Throughput">
+                    </div>
+                    <div class="correlation-info">
+                        <p>Pearson Correlation: 0.60<br>
+                            負相關意味著當WCI指數上升（運輸成本上升）時，TEU指標（貨運量）會有下降的趨勢。</p>
+                    </div>
+                </div>
+                <div class="description-item">
+                    <p class="insight"> Business Insight</p>
+                    <div class=" full-part">
+                        <p class="full" >
+                            WCI指數（World Container Index，世界集裝箱指數）基於集裝箱運輸成本的指數，反映航運市場的供需情況和運輸成本變化。<br>
+                            TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br>
+                            綜合WCI指數與TEU數據可以動態提供市場變化，企業得以採取前瞻性決策，即時優化供應鏈流程，在全球市場中更具競爭力。<br><br>
+                            分析顯示當WCI指數升高，顯示運輸成本壓力上升，企業對於全球運輸策略的靈活調整更顯重要，TEU的減少則顯示正在縮減的運輸規模
+                            運輸成本的增加會抑制貨運需求，因此企業在高WCI時期，應評估庫存策略，並深入分析其他成本變動趨勢，尋找更多cost saving機會，如透過長期合約方式與供應鏈上下游合作，共同承擔成本上升帶來的衝擊，打造雙贏局面。<br>
+
+
+                        </p>
+                        <button class="read-more-btn">⛴﹏Read More﹏⛴</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class=" source-row">
+                <p class="source">source: 航港局 iMarine</p>
+            </div>
         </div>
 
-        <h5>Stock Index vs. Container Throughput</h5>
         <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph4 }}">
-            </div><div class="description-item">
-            <p>Description ...</p>
-        </div>
+            <h5>Stock Index vs. Cargo Volume</h5>
+            <div class="content-row">
+                <div class="left-side">
+                    <div class="image-item">
+                        <img src="data:image/png;base64,{{ graph5 }}" alt="Stock Index vs. Cargo Volume">
+                    </div>
+                    <div class="correlation-info">
+                        <p>Pearson Correlation: 0.23<br>
+                            負相關意味著當WCI指數上升（運輸成本上升）時，TEU指標（貨運量）會有下降的趨勢。</p>
+                    </div>
+                </div>
+                <div class="description-item">
+                    <p class="insight"> Business Insight</p>
+                    <div class=" full-part">
+                        <p class="full" >
+                            WCI指數（World Container Index，世界集裝箱指數）基於集裝箱運輸成本的指數，反映航運市場的供需情況和運輸成本變化。<br>
+                            TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br>
+                            綜合WCI指數與TEU數據可以動態提供市場變化，企業得以採取前瞻性決策，即時優化供應鏈流程，在全球市場中更具競爭力。<br><br>
+                            分析顯示當WCI指數升高，顯示運輸成本壓力上升，企業對於全球運輸策略的靈活調整更顯重要，TEU的減少則顯示正在縮減的運輸規模
+                            運輸成本的增加會抑制貨運需求，因此企業在高WCI時期，應評估庫存策略，並深入分析其他成本變動趨勢，尋找更多cost saving機會，如透過長期合約方式與供應鏈上下游合作，共同承擔成本上升帶來的衝擊，打造雙贏局面。<br>
 
-        <h5>Stock Index vs. Cargo Volume</h5>
-        <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph5 }}">
-            </div><div class="description-item">
-            <p>Description ...</p>
-        </div>
 
-    </div>
+                        </p>
+                        <button class="read-more-btn">⛴﹏Read More﹏⛴</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class=" source-row">
+                <p class="source">source: 航港局 iMarine</p>
+            </div>
+        </div>
 
 
 <!--    <div id="map" class="tabcontent">-->
@@ -78,7 +208,9 @@
 <!--        <iframe id="grafanaDashboard3" src="http://13.237.180.170:3000/d/edja9ua935hq8f/map?orgId=1&from=1713578219915&to=1713599819915&theme=light&kiosk&token={{ grafana_api_token }}" width="100%" height="1000" frameborder="0"></iframe>-->
 
 <!--    </div>-->
-
+    <footer>
+        ©2024 Marine Time. All rights reserved. |  <a href="#">Terms of Service</a> | Follow me on <a href="#">LinkedIn</a>
+    </footer>
     <script>
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -89,7 +221,7 @@
         if (!targetAnchor) return;
 
         let elementPosition = window.scrollY + targetAnchor.getBoundingClientRect().top;
-        let offsetPosition = elementPosition - 0; // Height of the header. Adjust as needed.
+        let offsetPosition = elementPosition - 0;
 
         window.scrollTo({
             top: offsetPosition,
@@ -99,7 +231,32 @@
 });
 
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.read-more-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    var fullDescription = this.previousElementSibling; // The <p> element
+                    var isTruncated = fullDescription.style.maxHeight !== 'none';
+
+                    if (isTruncated) {
+                        // If truncated, expand to show full text
+                        fullDescription.style.maxHeight = 'none';
+                        fullDescription.style.overflow = 'visible';
+                        this.textContent = '⛴﹏Read Less﹏⛴';
+                    } else {
+                        // If expanded, collapse to show partial text
+                        fullDescription.style.maxHeight = '4.5em';
+                        fullDescription.style.overflow = 'hidden';
+                        this.textContent = '⛴﹏Read More﹏⛴';
+            }
+        });
+    });
+});
+
+    </script>
 
 
-</body>
+
+
+    </body>
 </html>
