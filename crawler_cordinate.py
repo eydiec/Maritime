@@ -87,74 +87,79 @@ def get_port():
 
 
 def crawl_cordinate(portname):
+    data ={}
     with webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options) as driver:
         try:
             driver.get(f'https://www.vesselfinder.com/ports/{portname}001')
-            location = driver.find_element(By.CLASS_NAME, "text1").text
+            try:
+                location = driver.find_element(By.CLASS_NAME, "text1").text
 
-            parts = location.split(" is located in ")
-            city = parts[0].replace("Port of ", "").strip()
-            rest = parts[1].split(" at ")
-            country = rest[0].strip()
-            coords = rest[1].split(', ')
-            latitude = coords[0].strip()
-            longitude = coords[1].split('.\n')[0].strip()
+                parts = location.split(" is located in ")
+                city = parts[0].replace("Port of ", "").strip()
+                rest = parts[1].split(" at ")
+                country = rest[0].strip()
+                coords = rest[1].split(', ')
+                latitude = coords[0].strip()
+                longitude = coords[1].split('.\n')[0].strip()
 
-            point = Point("port_data").tag("portname", portname).tag("city", city).tag("country", country).field("latitude", latitude).field("longitude", longitude).time(datetime.datetime.now(pytz.timezone('Asia/Taipei')))
-            write_api.write(bucket=bucket, org=org, record=point)
-            logging.info(f"Data successfully written to InfluxDB for {portname}")
-
-        except NoSuchElementException:
-            logging.error(f"Element not found for port: {portname}")
-        except WebDriverException as e:
-            logging.error(f"WebDriver error for {portname}: {e}")
+                data = {
+                    "portname": portname,
+                    "city": city,
+                    "country": country,
+                    "latitude": latitude,
+                    "longitude": longitude,
+                    "timestamp": datetime.datetime.now(pytz.timezone('Asia/Taipei')).isoformat()
+                }
+                logging.info(f"Data successfully collected for {portname}")
+            except NoSuchElementException:
+                logging.error(f"No data found for {portname}. Skipping this port.")
         except Exception as e:
-            logging.error(f"Error processing data for {portname}: {e}")
-        finally:
-            logging.info("WebDriver session closed.")
+            logging.error(f"Error accessing for {portname}: {e}")
+
+    return data
+
+def upload_to_influxdb():
+    with open('data/port_data.json', 'r') as f:
+        ports_data = json.load(f)
+
+        for data in ports_data:
+            try:
+                latitude_number, latitude_directtion = float(data['latitude'][:-1]), data['latitude'][-1]
+                if latitude_directtion == 'S':
+                    latitude_number *= -1
+                longitude_number, longitude_direction = float(data['longitude'][:-1]), data['longitude'][-1]
+                if longitude_direction == "W":
+                    longitude_direction *=-1
+                print(latitude_number,longitude_number)
+
+                point = Point("port_data") \
+                    .tag("portname", data['portname']) \
+                    .tag("city", data['city']) \
+                    .tag("country", data['country']) \
+                    .field("latitude", latitude_number) \
+                    .field("longitude", longitude_number) \
+                    .time(data['timestamp'])
+
+                write_api.write(bucket=bucket, org=org, record=point)
+                logging.info(f"Data successfully written to InfluxDB for {data['portname']}")
+
+            except Exception as e:
+                logging.error(f"Error writing to InfluxDB for {data['portname']}: {e}")
+                client = InfluxDBClient(token=token, url=url, org=org, timeout=90000)
+                write_api = client.write_api(write_options=SYNCHRONOUS, timeout=900000)
 
 
-    # print(portname)
-    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    # url = f'https://www.vesselfinder.com/ports/{portname}001'
-    # driver.get(url)
-    # # body > div.body-wrapper > div .body-inner > main .mygrid3px > div .page > div.port-section > p .text1
-    #
-    #
-    # location = driver.find_element(By.CLASS_NAME, "text1").text
-    #
-    # parts = location.split(" is located in ")
-    # pre_country = parts[0]
-    # rest1 = parts[1]
-    # city = pre_country.replace("Port of ", "").strip()
-    # country_parts = rest1.split(" at ")
-    # country = country_parts[0].strip()
-    # rest2 = country_parts[1].split(', ')
-    # latitude = rest2[0].strip()
-    # longitude = rest2[1].split('.\n')[0].strip()
-    # print(f"City: {city}, Country: {country}, Latitude: {latitude}, Longitude: {longitude}")
 
-    #
-    # #save to InfluxDB
-    # point = Point("port_data").tag("city", city).tag("country", country).field("latitude", latitude).field("longitude", longitude).time(datetime.datetime.now(pytz.timezone('Asia/Taipei')))
-    # try:
-    #     write_api.write(bucket=bucket, org=org, record=point)
-    #     logging.info(f"Data successfully written to InfluxDB for {portname}")
-    # except Exception as e:
-    #     logging.error(f"fail for {portname}: {e}")
-
-
-
+all_ports =[]
 ports = get_port()
+print(len(ports))
 for port in ports:
-    try:
-        crawl_cordinate(port)
-    except Exception as e:
-        logging.error(f"Error processing {port}: {e}")
-        client = InfluxDBClient(token=token, url=url, org=org, timeout=90000)
-        write_api = client.write_api(write_options=SYNCHRONOUS, timeout=900000)
-#
-# crawl_cordinate('TWKHH')
-# crawl_cordinate('JPYKK')
-# crawl_cordinate('UEIRJ')
-# crawl_cordinate('TTPTF')
+    port_data=crawl_cordinate(port)
+    if port_data:
+        all_ports.append(port_data)
+print(all_ports)
+with open('data/port_data.json', 'w') as f:
+    json.dump(all_ports, f)
+
+upload_to_influxdb()
+
