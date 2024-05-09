@@ -64,7 +64,7 @@ def lambda_handler(event, context):
                 try:
                     origin_port = row[1] if "進" in filename else None
                     origin_state = row[2] if "進" in filename else None
-                    boat_type = row[4] if row[4].strip() != '' else None
+                    boat_type = row[4] if row[4].strip() != '' else 'Others'
                     destination_port = row[2] if "出" in filename else None
                     destination_state = row[3] if "出" in filename else None
                     remark = row[5].strip() if row[5].strip() != '' else None

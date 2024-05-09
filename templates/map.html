@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
     <link rel="stylesheet" href="/static/marine.css">
 
+
     <style>
         html, body {
             width: 100%;
@@ -22,12 +23,25 @@
             left: 0;
         }
         .custom-div-icon {
-            background-color:  #CFFF04;
+
+            background-color: #30a3ec;
             border-radius: 50%;
-            width: 3px;
-            height: 3px;
-            box-shadow: 0 0 3px  #CFFF04;
+            width: 12px;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border: 1px solid #30a3ec;
+            animation: pulse 2s infinite;
         }
+        .custom-div-icon::after {
+            content: '';
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.4) 40%, transparent 70%);
+            border-radius: 50%;
+}
     </style>
 
 </head>
@@ -35,90 +49,132 @@
     <div class="header">
         <h1>Marine Time</h1>
         <nav class="tab">
-            <a href="/#port">Port</a>
-            <a href="/#analyze">Analyze</a>
-            <a href="/map">Map</a>
+            <a href="/#port">港口資訊</a>
+            <a href="/#analyze">指標分析</a>
+            <a href="/map">船舶地圖</a>
 
             <span></span>
         </nav>
+
+
+
+        <nav class="timeline">
+            <ul class="month-list">
+<!--                <li>Jan</li>-->
+
+            </ul>
+
+            <div id="current-month-indicator" class="month-indicator"></div>
+
+        </nav>
+        <div id="tooltip" ></div>
+
     </div>
+    <div id="shipSelectionHint" class="hint-popup">
+        <p>選擇查看進港或出港的船舶動態→</p>
+    </div>
+    <div id="monthNavigationHint" class="hint-popup">
+        <p>↓移動鼠標至任一月份，顯示該月船舶詳細資訊</p>
+    </div>
+
     <div id="map"></div>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="http://ewoken.github.io/Leaflet.MovingMarker/MovingMarker.js"></script>
+
+    <div id="info-box">
+        <p class="boat-count">貨櫃船: 0</p>
+        <p class="boat-count">乾散貨船: 0</p>
+        <p class="boat-count">客船: 0</p>
+    </div>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var map = L.map('map', {
-                center: [23.6978, 120.9605],
-                zoom: 3
+document.addEventListener('DOMContentLoaded', function () {
+    const spanIndicator = document.querySelector('.tab > span');
+    const tabLinks = document.querySelectorAll('.tab a');
+    let activeLink = null; // To keep track of the current active link
+
+    function moveIndicatorTo(element) {
+        // Get the clicked or hovered anchor's position and dimensions
+        const rect = element.getBoundingClientRect();
+        const offsetLeft = element.offsetLeft;
+        const width = rect.width;
+
+        // Update the span's position
+        spanIndicator.style.width = `${width}px`;
+        spanIndicator.style.left = `${offsetLeft}px`;
+    }
+
+    // Add click event listeners to each anchor for smooth scrolling
+    tabLinks.forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+
+            // If the link leads to another webpage, allow default behavior
+            if (!href.startsWith("#")) return;
+
+            // Prevent the default anchor click behavior
+            e.preventDefault();
+
+            // Update the active link reference
+            activeLink = this;
+
+            // Move the indicator to the clicked tab
+            moveIndicatorTo(this);
+
+            // Smooth scroll to the target section
+            const targetAnchor = document.querySelector(href);
+            if (!targetAnchor) return;
+
+            const elementPosition = window.scrollY + targetAnchor.getBoundingClientRect().top;
+            const offsetPosition = elementPosition - 0;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
             });
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &amp; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd', maxZoom: 20
-            }).addTo(map);
-<!--L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.{format}', {-->
-<!--	attribution: 'Imagery provided by services from the Global Imagery Browse Services (GIBS), operated by the NASA/GSFC/Earth Science Data and Information System (<a href="https://earthdata.nasa.gov">ESDIS</a>) with funding provided by NASA/HQ.',-->
-<!--	bounds: [[-85.0511287776, -179.999999975], [85.0511287776, 179.999999975]],-->
-<!--	minZoom: 1,-->
-<!--	maxZoom: 8,-->
-<!--	format: 'jpg',-->
-<!--	time: '',-->
-<!--	tilematrixset: 'GoogleMapsCompatible_Level'-->
-<!--}).addTo(map);;-->
-
-            // Define feature groups
-                var arrivingShips = L.featureGroup();
-                var departingShips = L.featureGroup();
-
-
-            // Define the start and end points of arriving ships
-            var startLatLng_arriving = L.latLng(-20.0, 118.0);
-            var endLatLng_arriving = L.latLng(22.5529, 120.2851);
-
-            // Create the moving marker using the plugin with a yellow circle icon
-            var movingMarker = L.Marker.movingMarker([startLatLng_arriving, endLatLng_arriving], [5000], {
-                autostart: true,
-                icon: L.divIcon({
-                    className: 'custom-div-icon',
-                    html: "<div style='background-color: #ffff00; border-radius: 50%; width: 3px; height: 3px; box-shadow: 0 0 3px #ffff00;'></div>",
-                    iconSize: [0.5, 0.5],
-                    iconAnchor: [0.5, 0.5]
-                })
-            }).addTo(arrivingShips);
-
-            // Define the start and end points of arriving ships
-            var startLatLng_departing = L.latLng(35.0, 129.0);
-            var endLatLng_departing = L.latLng(22.5529, 120.2851);
-
-            // Create the moving marker using the plugin with a yellow circle icon
-            var movingMarker = L.Marker.movingMarker([startLatLng_departing, endLatLng_departing], [5000], {
-                autostart: true,
-                icon: L.divIcon({
-                    className: 'custom-div-icon',
-                    html: "<div style='background-color: #ffff00; border-radius: 50%; width: 3px; height: 3px; box-shadow: 0 0 3px #ffff00;'></div>",
-                    iconSize: [0.5, 0.5],
-                    iconAnchor: [0.5, 0.5]
-                })
-            }).addTo(arrivingShips);
-
-            // Add the feature groups to the map
-                arrivingShips.addTo(map);
-                departingShips.addTo(map);
-
-            // Add layer control to the map
-                L.control.layers(null, {
-                    'Arriving Ships': arrivingShips,
-                    'Departing Ships': departingShips
-                }, {
-                    collapsed: false
-                }).addTo(map);
-
-
-
-            // Event listener when the moving marker stops
-<!--            movingMarker.on('end', function() {-->
-<!--                map.removeLayer(movingMarker);-->
-<!--            });-->
         });
+
+        // Move indicator on hover
+        anchor.addEventListener('mouseover', function () {
+            moveIndicatorTo(this);
+        });
+
+        // Restore to active link's position after hover
+        anchor.addEventListener('mouseout', function () {
+            if (activeLink) {
+                moveIndicatorTo(activeLink);
+            }
+        });
+    });
+
+    // Initialize the indicator on the first tab, or set an existing active one
+    activeLink = tabLinks[2];
+    moveIndicatorTo(activeLink);
+});
+
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show hint popups when the page loads
+        const hintPopups = document.querySelectorAll('.hint-popup');
+        hintPopups.forEach(hint => {
+            hint.style.display = 'block';  // Ensure your CSS starts with display: none;
+        });
+
+        // Add event listener to the document to hide hints on any click
+        document.addEventListener('click', function() {
+            hintPopups.forEach(hint => {
+                hint.style.display = 'none';
+            });
+        });
+    });
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://ewoken.github.io/Leaflet.MovingMarker/MovingMarker.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/static/map.js"></script>
+
+
+
+
 </body>
 </html>
