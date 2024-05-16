@@ -3,103 +3,615 @@
 <head>
     <meta charset="UTF-8">
     <title>Marine Time</title>
+    <link rel="icon" href="/static/fin.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
     <link rel="stylesheet" href="/static/marine.css">
+
 
 
 
 </head>
 <body>
+
     <div class="header">
-        <h1>Marine Time</h1>
+<!--        <img src="/static/fin.png" alt="Marine Time Logo" style="height: 50px; filter: grayscale(50%);">-->
+        <h1><a href="#port" style="font-family: 'Georgia', serif; text-decoration: none; color: inherit;">Marine Time</a></h1>
         <nav class="tab">
-            <a href="#port">Port</a>
-            <a href="#analyze">Analyze</a>
-            <a href="#map">Map</a>
+            <a href="#port">港口資訊</a>
+            <a href="#analyze">指標分析</a>
+            <a href="/map">船舶地圖</a>
 
             <span></span>
         </nav>
     </div>
 
+    <div id="introPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <h2>歡迎來到Marine Time</h2>
+            <p>在這裡，你隨手就能掌握台灣四大商港的最新動態和營運情況哦！我們還準備了深入國際的指標分析，夠過直觀的視覺化地圖，你可以一目了然地看到各船舶在台灣周邊的行動軌跡。<br><br>
+            快點右上角，開始探索更多精彩內容吧！<br>
+            </p>
+            <button onclick="closePopup()">啟航囉</button>
+        </div>
+    </div>
+
+
     <div id="port" class="tabcontent">
-      <h3>Port Quickview</h3>
-                <iframe id="grafanaDashboard2" src="http://13.237.180.170:3000/d/adiii827jcnb4e/marine-time?orgId=1&1609430400000&to=1713424678805&theme=light&kiosk&token={{ grafana_api_token }}" width="100%" height="900" frameborder="0"></iframe>
+      <h3>4大商港即時資訊&營運狀況</h3>
+        <iframe id="grafanaDashboard2" src="https://marine-time.online/grafana/d/adiii827jcnb4e/marine-time?orgId=1&1609430400000&to=1713424678805&theme=light&kiosk&token={{ grafana_api_token }}" width="100%" height="900" frameborder="0"></iframe>
 
     </div>
     <div id="analyze" class="tabcontent">
-      <h3>4大商港指標與國際指數分析</h3>
-</div>
-        <h5>WCI Index vs. TEU</h5>
-        <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph1 }}">
+      <h3>商港指標與國際指數分析</h3>
+        <p class="purpose">在全球化經濟中，台灣航運業扮演著至關重要的角色。對於貨櫃運輸、散裝貨運及股市航運指數的進一步分析，能為決策者和投資人提供寶貴的市場洞察。<br>以下將分別比較主要指標，以評估它們對航運市場的影響和相互關係。</p>
+
+        <div class="accordion" id="accordionExample">
+            <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                貨櫃量能與國際指數(WCI&FBX)的分析比較
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                  <p class="purpose">本分析將探討世界集裝箱指數（WCI）和運費指數（FBX）與台灣貨櫃運輸量之間的相關性。<br>透過評估運輸成本變化與貨櫃運輸量的關聯，預測未來貿易量的變化及對全球供應鏈的影響。</p>
+                  <div class="correlation-container">
+                      <div class="correlation-info">
+                        <img src="data:image/png;base64,{{ graph1 }}" alt="WCI Index vs. TEU">
+
+                        <p class="insight">統計分析</p>
+                        <p>皮爾森相關係數 (Pearson Correlation): 0.38<br></p>
+                        <p>WCI指數和TEU之間存在輕微正相關，意味著當WCI指數上升（運輸成本上升）時，TEU指標（貨運量）也傾向於有些微的增長趨勢。
+                           這種關係可能反映出在成本增加時，可能由於需求增加或供應鏈壓力，運輸量亦相應增加。</p>
+                        <p>回歸線的向上傾斜進一步證實了這種正相關，指出隨著WCI指數的增加，TEU的數值也趨於增加。然而，相關係數的值（0.38）顯示這種相關性雖然存在，但不是特別強烈，暗示還有其他因素可能影響著TEU的變動。</p>
+
+                        <p class="insight"> 商業分析</p>
+                        <h3>指標概述</h3>
+                        <p>WCI指數（World Container Index，世界集裝箱指數）基於集裝箱運輸成本的指數，反映航運市場的供需情況和運輸成本變化。<br></p>
+                        <p>TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br></p>
+                        <h3>指數變動對市場的影響</h3>
+                        <p>分析顯示當WCI指數升高，顯示運輸成本壓力上升，企業對於全球運輸策略的靈活調整更顯重要，TEU的減少則顯示正在縮減的運輸規模。</p>
+
+                        <p>運輸成本的增加會抑制貨運需求，因此企業在高WCI時期，應評估庫存策略，並深入分析其他成本變動趨勢，尋找更多cost saving機會，如透過長期合約方式與供應鏈上下游合作，共同承擔成本上升帶來的衝擊，打造雙贏局面。<br>
+                            綜合WCI指數與TEU數據可以動態提供市場變化，企業得以採取前瞻性決策，即時優化供應鏈流程，在全球市場中更具競爭力。<br><br></p>
+
+
+                        <div class="source-row">
+                            <p class="source">source: 航港局 iMarine, Drewry World Container Index</p>
+                        </div>
+                    </div>
+                      <div class="correlation-info">
+                          <img src="data:image/png;base64,{{ graph2 }}" alt="FBX Index vs. TEU">
+                          <p class="insight">統計分析</p>
+                          <p>皮爾森相關係數 (Pearson Correlation): 0.29<br></p>
+                          <p>FBX指數和TEU之間存在輕微正相關，意味著當FBX指數上升（運費指數提高）時，TEU指標（貨櫃量）會有增加的趨勢。 這種相關性表明，隨著運輸成本的增加，可能由於市場活動增加或貨運需求的提升，貨櫃運輸量亦隨之增長</p>
+                          <p>回歸線的向上傾斜確認了正相關的存在，意味著在運費成本提升的情況下，貨櫃運輸量仍正向增長。然而，相關係數僅為0.29，顯示這種相關性存在但不顯著，除了FBX指數外，尚有其他因素可能在影響著TEU的數值。</p>
+                          <p>信賴區間表示在95%信心水平下有可能出現的區域，範圍的寬窄則反映數據預測的精確度。</p>
+                          <p class="insight"> 商業分析</p>
+                          <h3>指標概述</h3>
+                          <p>FBX指數（Freightos Baltic Index，貨運指數）反映即時運費市場的動態。<br></p>
+                          <p>TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br></p>
+                          <h3>指數變動對市場的影響</h3>
+                          <p>分析顯示，當貨運指數上升時，貨櫃運輸量也隨之增加，意味著全球貿易活動的擴展，經濟擴張和消費市場的開發對運輸量的需求，即使運費上漲，市場對運輸量能的需求仍持續增長。</p>
+                          <p>這樣的情況顯示運輸業對需求變化的高度敏感性及運輸服務的價值，企業可以通過提高運輸效率提供更多增值服務，客戶則願意支付更高的價格換取可靠的運輸選項。</p>
+                          <p>貨櫃運輸量與FBX指數分析，可以更靈敏地反映市場變化，揭示供需狀況，有助於進行市場趨勢分析和需求預測，並關注運輸效率和成本效益之間的平衡。</p>
+                          <p>FBX指數與WCI指數皆提供有關航運成本的重要訊息，但FBX指數涵蓋更多航線，提供更全面、更即時的全球運輸成本數據。</p>
+                          <p>此外，FBX指數的上升也可視為經濟活動增加的指標，為了適應市場環境的快速變化，企業需密切關注相關指標，並調整中長期的策略規劃。</p>
+
+                        <div class="source-row">
+                            <p class="source">source: 航港局 iMarine, Freightos Data</p>
+                        </div>
+                      </div>
+                  </div>
+              </div>
             </div>
-            <div class="description-item">
-            <p>Description ...</p>
+          </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    散裝貨物與國際指數(BDI)的分析比較
+                  </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                      <p class="purpose">BDI是評估全球散裝運輸市場狀況的重要指標，本研究將揭示經濟活動增減與航運成本間的動態關係。</p>
+                    <div class="correlation-container">
+                          <div class="correlation-info">
+                              <img src="data:image/png;base64,{{ graph3 }}" alt="BDI Index vs. Dry Material Cargo">
+                              <p class="insight">統計分析</p>
+                              <p>皮爾森相關係數 (Pearson Correlation): 0.61<br></p>
+                              <p>兩者之前存在明顯的正向關係，這種關係指出，隨著乾散貨運輸量的增加，航運成本（BDI）亦趨於上升，這種關聯反映了更高的貨物運輸需求帶來的航運費用增加，或是更大規模的船隻被動員來應對增加的貨運量。 進一步觀察回歸線及其信賴區間，我們可以更精細地解釋數據趨勢及其可靠性。</p>
+                              <p>回歸線的上升趨勢證實了正相關的存在，即乾散貨運輸量與BDI指數正向相關，這意味著一旦乾散貨運輸量增加，相應的航運成本亦會增加。</p>
+                              <p>信賴區間的寬窄提供了關於預測精確度的重要資訊：在BDI指數較高的數值範圍內，信賴區間變得較寬，指出在這些數值範圍內的預測有較大的不確定性。這種不確定性可能源於市場波動、供需動態的變化或其他經濟因素，這些都可能影響航運成本和運輸量。</p>
+                              <p class="insight"> 商業分析</p>
+                              <h3>指標概述</h3>
+                              <p>BDI指數（Baltic Dry Index，波羅的海綜合航運指數）通過衡量特定航線上運輸乾散貨的運費變化，反映全球船運市場的供需狀況。由於它是根據實際運費計算出來的，因此被視為全球經濟健康狀況的前瞻性指標。</p>
+                              <p>Dry Material Cargo（台灣乾散貨運輸量)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。</p>
+                              <h3>指數變動對市場的影響</h3>
+                              <p>分析顯示正相關的趨勢可能表明市場對原物料的需求正在增長，通常與經濟擴張和建設活動增多有關。</p>
+                              <p>此外，上升的乾散貨運輸量指向台灣經濟活動的加快，在運輸成本的上漲時期，仍然吸收成本推動更多的運輸活動，特別是原物料需求度高的產業，需要進行綜合的市場分析，不僅需要關注當前的成本和需求，還要考慮長期的經濟發展趨勢、政策變化以及潛在的市場風險。</p>
+                              <p>穩定上升的BDI指數為航運企業提供了增加投資的信心，可能是擴大船隊、提升運輸效率或調整貨運策略的信號。然而對於原物料密集產業，這可能意味著生產成本上升，需要通過有效策略維持企業利潤，有助於企業預測市場動態並做出及時反應</p>
+
+
+                            <div class="source-row">
+                                <p class="source">source: 航港局 iMarine, Bloomberg</p>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                    台股航運指數與貨櫃/貨物量的分析比較
+                  </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                      <p class="purpose">探討台灣股市中航運股指數的變動如何反映實際的航運活動，包括貨櫃和散裝貨物的運輸量。<br>此分析有助於理解航運股價與實際運輸需求之間的相互作用。</p>
+                      <div class="correlation-container">
+                          <div class="correlation-info">
+                            <img src="data:image/png;base64,{{ graph4 }}" alt="Stock Index vs. Container Throughput">
+
+                            <p class="insight">統計分析</p>
+                            <p>皮爾森相關係數 (Pearson Correlation): 0.60<br></p>
+                            <p>航運股指數與貨櫃吞吐量（TEU）之間存在明顯的正相關，意味著當貨櫃吞吐量增加時，航運公司的經濟表現可能改善，這反映在航運股指數的提升上。正相關的存在強調了兩者之間的互動性，即航運業的繁榮直接影響航運公司的財務表現。</p>
+                            <p>上升的回歸線提供直觀證明，而信賴區間的寬度則提供了預測的可靠性與波動範圍。</p>
+                            <p>這種相關性指出在全球貿易增加，尤其是海運貨櫃量增加時，航運公司的營業額及其股價可能會上升。</p>
+
+                            <p class="insight"> 商業分析</p>
+                            <h3>指標概述</h3>
+                            <p>台灣-航運業類指數，反映航運公司股票的整體趨勢。航運依不同載運類別分為貨櫃航運、散裝航運兩大類型。貨櫃航運主要受到全球經濟影響，根據證交所資料，貨櫃船公司的總佔比為 46.42%，其中主要概念股有長榮(2603)、陽明(2609)、萬海(2615)，貨櫃海運對應的全球指數為WCI<br>
+                              <p>TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，反映了貨櫃航運的活躍程度，評估航運業整體效率的指標。</p>
+
+
+                            <h3>指數變動對市場的影響</h3>
+                            <p>此分析圖表將會著重於貨櫃航運，散裝航運請見下則分析。<br>
+                            貨櫃航運對全球經濟狀況高度敏感，其中TEU指標更被視為評估航運業績效的重要指標。
+                            從商業角度來看，這張圖表提供了投資人對於投資決策的判斷，投資人可以依據吞吐量的增減預測航運股票的表現<br><br>
+                            貨櫃航運通常受全球經濟的影響（詳見分析WCI Index vs. TEU），散裝航運則與基礎建設投資密切相關，（詳見分析BDI Index vs. Dry Material Cargo ）。<br>
+                            值得注意的是，投資人在考慮航運業投資時，應留意其周期性和受多種風險因素影響的特性。建議投資者密切關注全球經濟、地緣政治動態以及相關行業指標的變化，以制定適合的投資策略。<br></p>
+
+                            <div class="source-row">
+                                <p class="source">source: 航港局 iMarine, 證交所, 臺灣指數公司</p>
+                            </div>
+                        </div>
+                          <div class="correlation-info">
+                              <img src="data:image/png;base64,{{ graph5 }}" alt="Stock Index vs. Cargo Volume">
+                              <p class="insight">統計分析</p>
+                              <p>皮爾森相關係數 (Pearson Correlation): 0.22<br></p>
+                              <p>輕微正相關意味著當貨運量(Cargo Volume)上升時，航運股指數也會有些微正向增長的趨勢，但關係並不強烈，指數的變化不能完全通過貨運量的增減來解釋。
+                                當貨運量增加時，可能會對航運公司的營收和盈利能力產生正面影響，從而對其股價產生輕微的支持作用。</p>
+                              <p class="insight"> 商業分析</p>
+                              <h3>指標概述</h3>
+                              <p>台灣-航運業類指數，反映航運公司股票表現的整體趨勢。散裝航運仰賴工業和建設材料的運輸需求，依據船型有所區別，在台灣航運業類股票指數中散裝船隊公司的總佔比為 10.48%，主要概念股有益航 (2601)、新興 (2605)、裕民 (2606)、中航 (2612)、東森 (2614)、台航 (2617)、慧洋 - KY (2637)、正德 (2641)、四維航 (5608)、建新國際 (8367)，對應的國際指數為BDI（Baltic Dry Index，波羅的海綜合航運指數）。 從商業角度來看，這張圖表提供了投資人對於投資決策的判斷，投資人可以依據吞吐量的增減預測航運股票的表現<br></p>
+
+                              <p>Dry Material Cargo（台灣乾散貨運輸量)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。</p>
+                              <h3>指數變動對市場的影響</h3>
+                              <p>貨櫃航運和散裝航運在供需結構上有所不同。前者通常與全球貿易緊密相關，依賴零售市場和消費者需求，然而散裝航運更多受原物料供需影響，通常包括散裝貨物，如鐵礦石、煤炭、穀物等，其運輸量直接反映了航運業的活躍程度和運輸市場的需求情況。<br></p>
+
+                            <div class="source-row">
+                                <p class="source">source: 航港局 iMarine, 證交所, 臺灣指數公司</p>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFour">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                台灣出口值與航運指數的分析比較
+              </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                  <p class="purpose">分析台灣的出口總值與主要航運指數的相關性，探討航運業如何影響外貿績效，以其提供改善航運服務來增強外貿競爭力的見解。</p>
+                  <div class="correlation-info">
+                        <img src="data:image/png;base64,{{ graph6 }}" alt="Export Value vs. Stock Index">
+
+                        <p class="insight">統計分析</p>
+                        <p>皮爾森相關係數 (Pearson Correlation): 0.84<br></p>
+                        <p>分析顯示台灣出口值與股票指數之間的強烈正相關，當出口價值增加時，股市指數也顯著上升。這樣的高相關性通常指出兩者之間存在深刻的經濟聯動性，出口績效與經濟活動的緊密聯繫。</p>
+                        <p>從經濟學的角度來看，出口增加反映了國際市場對我國產品的高需求，不僅推動了企業的銷售和利潤增長，也可能透過稅收、就業機會增加等積極影響整體經濟表現。因此，股市作為經濟活動的衡量，正向關係也合理反映了出口的強勁增長。</p>
+                        <p>在此案例中，信賴區間相對較窄，表明數據資料較為集中，我們可以對回歸線的準確性抱有較高的信心。這也意味著，在預測航運股市與出口值的關係時，這個模型提供了可靠的依據。</p>
+                        <p class="insight"> 商業分析</p>
+                        <h3>指標概述</h3>
+                        <p>出口價值－衡量台灣向全球市場銷售商品和服務的總價值。反映了台灣經濟的外向型特徵，直接關聯於製造業和技術產品的國際競爭力。增加的出口價值通常預示著經濟增長和產業擴展，對於分析國家整體經濟具有重要意義。<br></p>
+                        <p>航運業類指數－主要追蹤台灣航運相關企業的股票表現，為投資者提供了一個衡量台灣航運業綜合表現的工具，反映了航運業對全球貿易動態的反應及其經濟環境適應性。航運指數的波動通常與全球貿易量和經濟條件密切相關。<br></p>
+                        <h3>指數變動對市場的影響</h3>
+                        <p>台灣經濟的出口導向性特徵特別明顯，其中約70%的出口來自製造業和高科技產品，這些產品不僅在全球市場上具有競爭力，也是推動台灣經濟增長的主要動力。高比例的出口對於航運業的影響尤為顯著，因為製造業和高科技產品的運輸需求直接影響到航運量和航運公司的運營效率。</p>
+                        <p>而製造業和高科技產品的出口增長通常需要穩定而高效的物流和供應鏈支持，這直接促進了對航運服務的需求。當這些產品的出口量增加時，不僅增加了從台灣到全球各地的貨運量，同時也可能會提高航運路線的密集度和運輸頻率，這些都會對航運業類指數產生正面影響。</p>
+                        <p>此外，高科技產品往往需要更為精密的運輸條件，如溫度控制、防震保護等，這增加了專業航運服務的需求，進一步推高了航運公司的技術和服務標準。隨著台灣高科技產品在全球市場的影響力擴大，航運公司也可能需要投資更多的資源來升級船隊和物流技術，以滿足更高標準的運輸需求。</p>
+                        <p>出口增長表明製造業和外貿表現良好，增強投資者對股市的信心，因此推高了股票指數。高出口價值也反映全球市場對我國產品的高需求，這不僅增強了整體經濟狀況，進一步促進了經濟的正循環，同時也提高了其股市的吸引力。</p>
+                        <p>航運業作為出口鏈條中的重要一環，其表現往往與全球貿易狀況密切相關。台灣-航運業類指數的波動可以被視為全球經濟健康狀況的風向標。當全球貿易量增加時，航運需求增強，航運公司的收益和股價自然上升。相對地，全球貿易放緩時，航運業可能面臨運價下降和運力過剩的問題，從而對股價產生壓力。</p>
+                        <p>在這樣的市場環境下，投資人需要密切關注國際貿易協議、經濟政策調整及其對出口和航運業的潛在影響。例如，貿易協議或是關稅調整都可能迅速改變出口成本和國際貿易流向，進而影響到相關股票的表現。因此，了解這些指標如何互動，對於制定前瞻性的投資策略至關重要。投資人應準備相應的風險管理方案，以應對市場的波動性。</p>
+
+                        <p><br><br></p>
+
+
+                        <div class="source-row">
+                            <p class="source">source: 證交所, 財政部</p>
+                        </div>
+                    </div>
+              </div>
+            </div>
+          </div>
+<!--            <div class="accordion-item">-->
+<!--            <h2 class="accordion-header" id="headingFive">-->
+<!--              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">-->
+<!--                產業別出口分析比較-->
+<!--              </button>-->
+<!--            </h2>-->
+<!--            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">-->
+<!--              <div class="accordion-body">-->
+<!--                  <div class="correlation-info">-->
+<!--                        <img src="data:image/png;base64,{{ graph1 }}" alt="WCI Index vs. TEU">-->
+
+<!--                        <p class="insight">統計分析</p>-->
+<!--                        <p>皮爾森相關係數 (Pearson Correlation): 0.38<br></p>-->
+<!--                        <p>WCI指數和TEU之間存在輕微正相關，意味著當WCI指數上升（運輸成本上升）時，TEU指標（貨運量）也傾向於有些微的增長趨勢。-->
+<!--                           這種關係可能反映出在成本增加時，可能由於需求增加或供應鏈壓力，運輸量亦相應增加。</p>-->
+<!--                        <p>回歸線的向上傾斜進一步證實了這種正相關，指出隨著WCI指數的增加，TEU的數值也趨於增加。然而，相關係數的值（0.38）顯示這種相關性雖然存在，但不是特別強烈，暗示還有其他因素可能影響著TEU的變動。</p>-->
+
+<!--                        <p class="insight"> 商業分析</p>-->
+<!--                        <h3>指標概述</h3>-->
+<!--                        <p>WCI指數（World Container Index，世界集裝箱指數）基於集裝箱運輸成本的指數，反映航運市場的供需情況和運輸成本變化。<br></p>-->
+<!--                        <p>TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br></p>-->
+<!--                        <h3>指數變動對市場的影響</h3>-->
+<!--                        <p>分析顯示當WCI指數升高，顯示運輸成本壓力上升，企業對於全球運輸策略的靈活調整更顯重要，TEU的減少則顯示正在縮減的運輸規模。</p>-->
+
+<!--                        <p>運輸成本的增加會抑制貨運需求，因此企業在高WCI時期，應評估庫存策略，並深入分析其他成本變動趨勢，尋找更多cost saving機會，如透過長期合約方式與供應鏈上下游合作，共同承擔成本上升帶來的衝擊，打造雙贏局面。<br>-->
+<!--                            綜合WCI指數與TEU數據可以動態提供市場變化，企業得以採取前瞻性決策，即時優化供應鏈流程，在全球市場中更具競爭力。<br><br></p>-->
+
+
+<!--                        <div class="source-row">-->
+<!--                            <p class="source">source: 航港局 iMarine, Drewry World Container Index</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
 
         </div>
 
-        <h5>FBX Index vs. TEU</h5>
-        <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph2 }}">
-            </div><div class="description-item">
-            <p>Description ...</p>
-        </div>
+<!--        <div class="image-wrapper">-->
 
-        <h5>BDI Index vs. Dry Material</h5>
-        <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph3 }}">
-            </div><div class="description-item">
-            <p>Description ...</p>
-        </div>
+<!--        <div class="image-container">-->
+<!--                <img src="data:image/png;base64,{{ graph1 }}" alt="WCI Index vs. TEU">-->
 
-        <h5>Stock Index vs. Container Throughput</h5>
-        <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph4 }}">
-            </div><div class="description-item">
-            <p>Description ...</p>
-        </div>
+<!--            <div class="content-row">-->
+<!--                <div class="left-side">-->
+<!--                    <div class="image-item">-->
 
-        <h5>Stock Index vs. Cargo Volume</h5>
-        <div class="image-container">
-            <div class="image-item">
-                <img src="data:image/png;base64,{{ graph5 }}">
-            </div><div class="description-item">
-            <p>Description ...</p>
-        </div>
+<!--                        <button class="read-more-btn" onclick="toggleContent(this)">⛴﹏Read More﹏⛴</button>-->
+<!--                        <div class="correlation-info" style="display: none;">-->
+<!--                            <p class="insight">統計分析</p>-->
+<!--                            <p>皮爾森相關係數 (Pearson Correlation): 0.38<br></p>-->
+<!--                            <p>WCI指數和TEU之間存在輕微正相關，意味著當WCI指數上升（運輸成本上升）時，TEU指標（貨運量）也傾向於有些微的增長趨勢。-->
+<!--                               這種關係可能反映出在成本增加時，可能由於需求增加或供應鏈壓力，運輸量亦相應增加。</p>-->
+<!--                            <p>回歸線的向上傾斜進一步證實了這種正相關，指出隨著WCI指數的增加，TEU的數值也趨於增加。然而，相關係數的值（0.38）顯示這種相關性雖然存在，但不是特別強烈，暗示還有其他因素可能影響著TEU的變動。</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="description-item">-->
+<!--                    <div class="full-part"  style="display: none;">-->
 
-    </div>
+<!--                        <p class="insight"> 商業分析</p>-->
+<!--                        <h3>指標概述</h3>-->
+<!--                        <p>WCI指數（World Container Index，世界集裝箱指數）基於集裝箱運輸成本的指數，反映航運市場的供需情況和運輸成本變化。<br></p>-->
+<!--                        <p>TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br></p>-->
+<!--                        <h3>指數變動對市場的影響</h3>-->
+<!--                        <p>分析顯示當WCI指數升高，顯示運輸成本壓力上升，企業對於全球運輸策略的靈活調整更顯重要，TEU的減少則顯示正在縮減的運輸規模。</p>-->
+
+<!--                        <p>運輸成本的增加會抑制貨運需求，因此企業在高WCI時期，應評估庫存策略，並深入分析其他成本變動趨勢，尋找更多cost saving機會，如透過長期合約方式與供應鏈上下游合作，共同承擔成本上升帶來的衝擊，打造雙贏局面。<br>-->
+<!--                            綜合WCI指數與TEU數據可以動態提供市場變化，企業得以採取前瞻性決策，即時優化供應鏈流程，在全球市場中更具競爭力。<br><br></p>-->
 
 
-    <div id="map" class="tabcontent">
-      <h3>Map</h3>
-        <iframe id="grafanaDashboard3" src="http://13.237.180.170:3000/d/edja9ua935hq8f/map?orgId=1&from=1713578219915&to=1713599819915&theme=light&kiosk&token={{ grafana_api_token }}" width="100%" height="1000" frameborder="0"></iframe>
 
-    </div>
+<!--                        <div class="source-row">-->
+<!--                            <p class="source">source: 航港局 iMarine, Drewry World Container Index</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="image-container">-->
+<!--                <img src="data:image/png;base64,{{ graph2 }}" alt="FBX Index vs. TEU">-->
+
+<!--            <div class="content-row">-->
+<!--                <div class="left-side">-->
+<!--                    <div class="image-item">-->
+
+<!--                        <button class="read-more-btn" onclick="toggleContent(this)">⛴﹏Read More﹏⛴</button>-->
+<!--                        <div class="correlation-info" style="display: none;">-->
+<!--                            <p class="insight">統計分析</p>-->
+<!--                            <p>皮爾森相關係數 (Pearson Correlation): 0.29<br></p>-->
+<!--                            <p>FBX指數和TEU之間存在輕微正相關，意味著當FBX指數上升（運費指數提高）時，TEU指標（貨櫃量）會有增加的趨勢。-->
+<!--                               這種相關性表明，隨著運輸成本的增加，可能由於市場活動增加或貨運需求的提升，貨櫃運輸量亦隨之增長</p>-->
+<!--                            <p>回歸線的向上傾斜確認了正相關的存在，這意味著在運費成本提升的情況下，與貨櫃運輸量之間呈正向增長關係。然而，相關係數僅為0.29，顯示這種相關性存在但不顯著，這暗示了除了FBX指數外，還有其他因素可能在影響著TEU的數值。</p>-->
+<!--                            <p>信賴區間表示在95%信心水平下有可能出現的區域，範圍的寬窄則反映數據預測的精確度。</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="description-item">-->
+<!--                    <div class="full-part"  style="display: none;">-->
+
+<!--                        <p class="insight"> 商業分析</p>-->
+<!--                        <h3>指標概述</h3>-->
+<!--                        <p>FBX指數（Freightos Baltic Index，貨運指數）反映即時運費市場的動態。<br></p>-->
+<!--                        <p>TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br></p>-->
+<!--                        <h3>指數變動對市場的影響</h3>-->
+<!--                        <p>分析顯示，當貨運指數上升時，貨櫃運輸量也隨之增加，意味著全球貿易活動的擴展，經濟擴張和消費市場的開發對運輸量的需求，即使運費上漲，市場對運輸量能的需求仍持續增長。</p>-->
+
+<!--                        <p>這樣的情況顯示運輸業對需求變化的高度敏感性及運輸服務的價值，企業可以通過提高運輸效率提供更多增值服務，客戶則願意支付更高的價格換取可靠的運輸選項。<br>-->
+<!--                            貨櫃運輸量與FBX指數分析，可以更靈敏地反映市場變化，揭示供需狀況，有助於進行市場趨勢分析和需求預測，並關注運輸效率和成本效益之間的平衡。<br>-->
+<!--                            FBX指數與前述WCI指數皆提供有關航運成本的重要訊息，但FBX指數涵蓋更多航線，提供更全面、更即時的全球運輸成本數據。<br>-->
+<!--                            此外，FBX指數的上升也可視為經濟活動增加的指標，為了適應市場環境的快速變化，企業需密切關注相關指標，並調整中長期的策略規劃。<br>-->
+<!--                        </p>-->
+
+
+
+<!--                        <div class="source-row">-->
+<!--                            <p class="source">source: 航港局 iMarine, Freightos Data</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="image-container">-->
+<!--            <img src="data:image/png;base64,{{ graph3 }}" alt="BDI Index vs. Dry Material Cargo">-->
+
+<!--            <div class="content-row">-->
+<!--                <div class="left-side">-->
+<!--                    <div class="image-item">-->
+
+<!--                        <button class="read-more-btn" onclick="toggleContent(this)">⛴﹏Read More﹏⛴</button>-->
+<!--                        <div class="correlation-info" style="display: none;">-->
+<!--                            <p class="insight">統計分析</p>-->
+<!--                            <p>皮爾森相關係數 (Pearson Correlation): 0.61<br></p>-->
+<!--                            <p>兩者之前存在明顯的正向關係，這種關係指出，隨著乾散貨運輸量的增加，航運成本（如BDI所代表）亦趨於上升，這種關聯反映了更高的貨物運輸需求帶來的航運費用增加，或是更大規模的船隻被動員來應對增加的貨運量。-->
+<!--                                進一步觀察回歸線及其信賴區間，我們可以更精細地解釋數據趨勢及其可靠性。回歸線的上升趨勢證實了正相關的存在，即乾散貨運輸量與BDI指數正向相關，這意味著一旦乾散貨運輸量增加，相應的航運成本亦會增加。</p>-->
+<!--                            <p>信賴區間的寬窄提供了關於預測精確度的重要資訊：在BDI指數較高的數值範圍內，信賴區間變得較寬，這指出在這些數值範圍內的預測有較大的不確定性。這種不確定性可能源於市場波動、供需動態的變化或其他經濟因素，這些都可能影響航運成本和運輸量。</p>-->
+
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="description-item">-->
+<!--                    <div class="full-part"  style="display: none;">-->
+
+<!--                        <p class="insight"> 商業分析</p>-->
+<!--                        <h3>指標概述</h3>-->
+<!--                        <p>BDI指數（Baltic Dry Index，波羅的海綜合航運指數）通過衡量特定航線上運輸乾散貨的運費變化，反映全球船運市場的供需狀況。由於它是根據實際運費計算出來的，因此被視為全球經濟健康狀況的前瞻性指標。<br></p>-->
+<!--                        <p>Dry Material Cargo（台灣乾散貨運輸量)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。<br></p>-->
+
+<!--                        <h3>指數變動對市場的影響</h3>-->
+<!--                        <p>分析顯示正相關的趨勢可能表明市場對原物料的需求正在增長，通常與經濟擴張和建設活動增多有關。<br></p>-->
+
+<!--                        <p>此外，上升的乾散貨運輸量指向台灣經濟活動的加快，在運輸成本的上漲時期，仍然吸收成本推動更多的運輸活動，特別是原物料需求度高的產業，需要進行綜合的市場分析，不僅關注當前的成本和需求，還要考慮長期的經濟發展趨勢、政策變化以及潛在的市場風險。<br>-->
+<!--                            穩定上升的BDI指數為航運企業提供了增加投資的信心，可能是擴大船隊、提升運輸效率或調整貨運策略的信號。然而對於原物料密集產業，這可能意味著生產成本上升，需要通過有效策略維持企業利潤，有助於企業預測市場動態並做出及時反應。<br></p>-->
+<!--                        <div class="source-row">-->
+<!--                            <p class="source">source: 航港局 iMarine, Bloomberg</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="image-container">-->
+<!--            <img src="data:image/png;base64,{{ graph4 }}" alt="Stock Index vs. Container Throughput">-->
+
+<!--            <div class="content-row">-->
+<!--                <div class="left-side">-->
+<!--                    <div class="image-item">-->
+<!--                        <button class="read-more-btn" onclick="toggleContent(this)">⛴﹏Read More﹏⛴</button>-->
+<!--                        <div class="correlation-info" style="display: none;">-->
+<!--                            <p class="insight">統計分析</p>-->
+<!--                            <p>皮爾森相關係數 (Pearson Correlation): 0.60<br></p>-->
+<!--                            <p>航運股指數與貨櫃吞吐量（TEU）之間存在明顯的正相關，意味著當貨櫃吞吐量增加時，航運公司的經濟表現可能改善，這反映在航運股指數的提升上。正相關的存在強調了兩者之間的互動性，即航運業的繁榮直接影響航運公司的財務表現。</p>-->
+<!--                            <p>上升的回歸線提供直觀證明，而信賴區間的寬度則提供了預測的可靠性與波動範圍。</p>-->
+<!--                            <p>這種相關性指出在全球貿易增加，尤其是海運貨櫃量增加時，航運公司的營業額及其股價可能會上升。</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="description-item">-->
+<!--                    <div class="full-part"  style="display: none;">-->
+
+<!--                        <p class="insight"> 商業分析</p>-->
+<!--                        <h3>指標概述</h3>-->
+<!--                        <p>台灣-航運業類指數，反映航運公司股票的整體趨勢。航運依不同載運類別分為貨櫃航運、散裝航運兩大類型。<br>-->
+<!--                            貨櫃航運主要受到全球經濟影響，根據證交所資料，貨櫃船公司的總佔比為 46.42%，其中主要概念股有長榮(2603)、陽明(2609)、萬海(2615)，貨櫃海運對應的全球指數為WCI<br>-->
+<!--                            散裝航運則是仰賴工業和建設材料的運輸需求，依據船型有所區別，在台灣航運業類股票指數中散裝船隊公司的總佔比為 10.48%，主要概念股有益航 (2601)、新興 (2605)、裕民 (2606)、中航 (2612)、東森 (2614)、台航 (2617)、慧洋 - KY (2637)、正德 (2641)、四維航 (5608)、建新國際 (8367)，對應的國際指數為BDI（Baltic Dry Index，波羅的海綜合航運指數）。<br></p>-->
+<!--                        <p>TEU（Twenty-foot Equivalent Unit，20呎標準貨櫃)，反映了貨櫃航運的活躍程度，評估航運業整體效率的指標。<br></p>-->
+
+<!--                        <h3>指數變動對市場的影響</h3>-->
+<!--                        <p>此分析圖表將會著重於貨櫃航運，散裝航運請見下則分析。<br>-->
+<!--                            貨櫃航運對全球經濟狀況高度敏感，其中TEU指標更被視為評估航運業績效的重要指標。-->
+<!--                            從商業角度來看，這張圖表提供了投資人對於投資決策的判斷，投資人可以依據吞吐量的增減預測航運股票的表現<br><br>-->
+<!--                            貨櫃航運通常受全球經濟的影響（詳見分析WCI Index vs. TEU），散裝航運則與基礎建設投資密切相關，（詳見分析BDI Index vs. Dry Material Cargo ）。<br>-->
+<!--                            值得注意的是，投資人在考慮航運業投資時，應留意其周期性和受多種風險因素影響的特性。建議投資者密切關注全球經濟、地緣政治動態以及相關行業指標的變化，以制定適合的投資策略。<br></p>-->
+
+<!--                        <div class="source-row">-->
+<!--                            <p class="source">source: 航港局 iMarine, 證交所, 臺灣指數公司</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="image-container">-->
+<!--            <img src="data:image/png;base64,{{ graph5 }}" alt="Stock Index vs. Cargo Volume">-->
+
+<!--            <div class="content-row">-->
+<!--                <div class="left-side">-->
+<!--                    <div class="image-item">-->
+<!--                        <button class="read-more-btn" onclick="toggleContent(this)">⛴﹏Read More﹏⛴</button>-->
+<!--                        <div class="correlation-info" style="display: none;">-->
+<!--                            <p class="insight">統計分析</p>-->
+<!--                            <p>皮爾森相關係數 (Pearson Correlation): 0.22<br></p>-->
+<!--                            <p>輕微正相關意味著當Cargo Volume（貨運量）上升時，航運股指數也會有些微正向增長的趨勢，但關係並不強烈，意味著指數的變化不能完全通過貨運量的增減來解釋。-->
+<!--                                當貨運量增加時，可能會對航運公司的營收和盈利能力產生正面影響，從而對其股價產生輕微的支持作用。</p>-->
+
+<!--</p>-->
+
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="description-item">-->
+<!--                    <div class="full-part"  style="display: none;">-->
+
+<!--                        <p class="insight"> 商業分析</p>-->
+<!--                        <h3>指標概述</h3>-->
+<!--                        <p>台灣-航運業類指數，反映航運公司股票表現的整體趨勢。</p>-->
+<!--                        <p>Dry Material Cargo（台灣乾散貨運輸量)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。</p>-->
+
+<!--                        <h3>指數變動對市場的影響</h3>-->
+<!--                        <p>貨櫃航運和散裝航運在供需結構上有所不同。前者通常與全球貿易緊密相關，依賴零售市場和消費者需求，然而散裝航運更多受原物料供需影響，通常包括散裝貨物，如鐵礦石、煤炭、穀物等，其運輸量直接反映了航運業的活躍程度和運輸市場的需求情況。<br></p>-->
+
+<!--                        <div class="source-row">-->
+<!--                            <p class="source">source: 航港局 iMarine, 證交所, 臺灣指數公司</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="image-container">-->
+<!--            <img src="data:image/png;base64,{{ graph6 }}" alt="Export Value vs. Stock Index">-->
+
+<!--            <div class="content-row">-->
+<!--                <div class="left-side">-->
+<!--                    <div class="image-item">-->
+<!--                        <button class="read-more-btn" onclick="toggleContent(this)">⛴﹏Read More﹏⛴</button>-->
+<!--                        <div class="correlation-info" style="display: none;">-->
+<!--                            <p class="insight">統計分析</p>-->
+<!--                            <p>皮爾森相關係數 (Pearson Correlation): 0.84<br></p>-->
+<!--                            <p>分析顯示台灣出口值與股票指數之間的強烈正相關，當出口價值增加時，股票指數也顯著上升。這樣的高相關性通常指出兩者之間存在深刻的經濟聯動性，股市的表現與國家的出口表現緊密相關。</p>-->
+<!--                            <p>從經濟學的角度來看，出口增加反映了國際市場對我國產品的高需求，不僅推動了企業的銷售和利潤增長，也可能透過稅收、就業機會增加等積極影響整體經濟表現。因此，股市作為經濟活動的衡量，正向關係也合理反映了出口的強勁增長。</p>-->
+<!--                            <p>在此案例中，信賴區間相對較窄，表明數據資料較為集中，我們可以對回歸線的準確性抱有較高的信心。這也意味著，在預測航運股市與出口值的關係時，這個模型提供了可靠的依據。</p>-->
+
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="description-item">-->
+<!--                    <div class="full-part"  style="display: none;">-->
+
+<!--                        <p class="insight"> 商業分析</p>-->
+<!--                        <h3>指標概述</h3>-->
+<!--                        <p>台灣-航運業類指數，反映航運公司股票表現的整體趨勢。</p>-->
+<!--                        <p>Dry Material Cargo（台灣乾散貨運輸量)，作為貨櫃船載櫃量能、船舶規模以及碼頭作業量能的指標。</p>-->
+
+<!--                        <h3>指數變動對市場的影響</h3>-->
+<!--                        <p>貨櫃航運和散裝航運在供需結構上有所不同。前者通常與全球貿易緊密相關，依賴零售市場和消費者需求，然而散裝航運更多受原物料供需影響，通常包括散裝貨物，如鐵礦石、煤炭、穀物等，其運輸量直接反映了航運業的活躍程度和運輸市場的需求情況。<br></p>-->
+
+<!--                        <div class="source-row">-->
+<!--                            <p class="source">source: 航港局 iMarine, 證交所, 臺灣指數公司</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--</div>-->
+
+<!--    <div id="map" class="tabcontent">-->
+<!--      <h3>Map</h3>-->
+<!--        <iframe id="grafanaDashboard3" src="http://13.237.180.170:3000/d/edja9ua935hq8f/map?orgId=1&from=1713578219915&to=1713599819915&theme=light&kiosk&token={{ grafana_api_token }}" width="100%" height="1000" frameborder="0"></iframe>-->
+
+<!--    </div>-->
+    <footer>
+        ©2024 Marine Time. All rights reserved. |  <a href="#">Terms of Service</a> | Follow me on <a href="#">LinkedIn</a>
+    </footer>
 
     <script>
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
+document.addEventListener('DOMContentLoaded', function () {
+    const spanIndicator = document.querySelector('.tab > span');
+    const tabLinks = document.querySelectorAll('.tab a');
+    let activeLink = null; // To keep track of the current active link
 
-        let targetID = this.getAttribute('href');
-        const targetAnchor = document.querySelector(targetID);
-        if (!targetAnchor) return;
+    function moveIndicatorTo(element) {
+        // Get the clicked or hovered anchor's position and dimensions
+        const rect = element.getBoundingClientRect();
+        const offsetLeft = element.offsetLeft;
+        const width = rect.width;
 
-        let elementPosition = window.scrollY + targetAnchor.getBoundingClientRect().top;
-        let offsetPosition = elementPosition - 0; // Height of the header. Adjust as needed.
+        // Update the span's position
+        spanIndicator.style.width = `${width}px`;
+        spanIndicator.style.left = `${offsetLeft}px`;
+    }
 
-        window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
+    // Add click event listeners to each anchor for smooth scrolling
+    tabLinks.forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+
+            // If the link leads to another webpage, allow default behavior
+            if (!href.startsWith("#")) return;
+
+            // Prevent the default anchor click behavior
+            e.preventDefault();
+
+            // Update the active link reference
+            activeLink = this;
+
+            // Move the indicator to the clicked tab
+            moveIndicatorTo(this);
+
+            // Smooth scroll to the target section
+            const targetAnchor = document.querySelector(href);
+            if (!targetAnchor) return;
+
+            const elementPosition = window.scrollY + targetAnchor.getBoundingClientRect().top;
+            const offsetPosition = elementPosition - 0;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        });
+
+        // Move indicator on hover
+        anchor.addEventListener('mouseover', function () {
+            moveIndicatorTo(this);
+        });
+
+        // Restore to active link's position after hover
+        anchor.addEventListener('mouseout', function () {
+            if (activeLink) {
+                moveIndicatorTo(activeLink);
+            }
         });
     });
+
+    // Initialize the indicator on the first tab, or set an existing active one
+    activeLink = tabLinks[0];
+    moveIndicatorTo(activeLink);
 });
 
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        // show the popup once first entry
+        if (localStorage.getItem('popupShown') !== 'true') {
+
+        document.getElementById('introPopup').style.display = 'flex';
+
+        // set a flag indicating popup has been shown
+        localStorage.setItem('popupShown', 'true');
+    }
+    });
+
+    function closePopup() {
+        document.getElementById('introPopup').style.display = 'none';
+    }
+    </script>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.1/dist/umd/popper.min.js" integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js" integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/" crossorigin="anonymous"></script>
 </body>
 </html>
