@@ -290,7 +290,7 @@ footer a:hover {
     list-style-type: none;
     text-align: center;
     display: flex;
-        justify-content: space-around;
+    justify-content: space-between;
 
 }
 
@@ -358,8 +358,9 @@ footer a:hover {
     height: 25px ;
     width: calc(100% / 365) ;
     background-color: rgba(76, 195, 247, 0.5) ;
-    transition:left 1.2s linear;
+    transition:left 1s linear;
     z-index: 1300;
+   /* transform: translateX(-50%);  center on its left position */
 
 }
 

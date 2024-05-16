@@ -116,7 +116,7 @@ function updateInfoBox(totals) {
     };
 //    alert(JSON.stringify(finalTotals, null, 2));
     // animation settings
-    const duration = 6000; // seconds per month
+    const duration = 6300; // seconds per month
     const frameRate = 120; // frames per second
     const frames = duration / (1000 / frameRate);
     let currentFrame = 0;
@@ -179,9 +179,9 @@ function showTooltip(index) {
     // Check if arriving ships are selected and add their counts
     if (selectedArriving) {
         const arrivingData = monthlyBoatData.arriving?.[selectedMonth] || {};
-        containerCount += arrivingData.Container || 5330;
-        dryBulkCount += arrivingData["Dry Bulk"] || 2830;
-        passengerCount += arrivingData.Passenger || 280;
+        containerCount += arrivingData.Container || 7630;
+        dryBulkCount += arrivingData["Dry Bulk"] || 3620;
+        passengerCount += arrivingData.Passenger || 380;
     }
     // Check if departing ships are selected and add their counts
     if (selectedDeparting) {
@@ -308,7 +308,7 @@ function setupMap() {
                  })
                 .catch(e => console.error(e));
         }
-        startMonthIndicatorAnimation(60000);
+        startMonthIndicatorAnimation(62000);
 
         arrivingShips.addTo(map);
         departingShips.addTo(map);
@@ -322,45 +322,85 @@ function setupMap() {
     animateShipsByMonths(months);
 }
 
+//function startMonthIndicatorAnimation(duration) {
+//    const indicator = document.querySelector('.month-indicator');
+//    const timeline = document.querySelector('.timeline ul');
+//    const totalMonths = 360; // adjusting the right position
+//
+//    // Calculate the width of the timeline and the width per month segment
+//    const timelineWidth = timeline.offsetWidth;
+//    const monthWidth = timelineWidth / totalMonths;
+//
+//    // Determine the starting month index from the current date
+//    const currentDate = new Date();
+//    let startMonth = currentDate.getMonth() ; //the last 12 months as starting point
+//
+//    // Calculate initial left position based on starting month
+//    const initialLeftPosition = monthWidth * startMonth *8.5;
+//    indicator.style.left = `${initialLeftPosition}px`;
+//
+//
+//    // Define animation settings
+//    const startTime = Date.now();
+//    const endTime = startTime + duration;
+//
+//    function updatePosition() {
+//        const currentTime = Date.now();
+//        const elapsed = currentTime - startTime;
+//        const progress = Math.min(elapsed / duration, 1); // Ensures the progress does not exceed 1
+//
+//        // Calculate new left position based on elapsed time
+//        const newLeftPosition = initialLeftPosition + (timelineWidth - initialLeftPosition) * progress;
+//        indicator.style.left = `${newLeftPosition}px`;
+//
+//        if (currentTime < endTime) {
+//            requestAnimationFrame(updatePosition);
+//        } else {
+//            // Snap to the correct end position if there's any rounding error in calculations
+//            indicator.style.left = `${timelineWidth - monthWidth}px`;
+//        }
+//    }
+//
+//    updatePosition();
+//}
+
 function startMonthIndicatorAnimation(duration) {
     const indicator = document.querySelector('.month-indicator');
-    const timeline = document.querySelector('.timeline ul');
-    const totalMonths = 360; // adjusting the right position
+    const monthItems = document.querySelectorAll('.timeline li');
 
-    // Calculate the width of the timeline and the width per month segment
-    const timelineWidth = timeline.offsetWidth;
-    const monthWidth = timelineWidth / totalMonths;
+    const firstMonthPosition = monthItems[0].offsetLeft + (monthItems[0].offsetWidth / 2);
+    const lastMonthPosition = monthItems[monthItems.length - 1].offsetLeft + (monthItems[monthItems.length - 1].offsetWidth / 2);
 
-    // Determine the starting month index from the current date
-    const currentDate = new Date();
-    let startMonth = currentDate.getMonth() ; //the last 12 months as starting point
+    const totalDistance = lastMonthPosition - firstMonthPosition;
+    const segmentDistance = totalDistance / 13;
 
-    // Calculate initial left position based on starting month
-    const initialLeftPosition = monthWidth * startMonth *8.5;
-    indicator.style.left = `${initialLeftPosition}px`;
+    let startTime = null;
+    let currentSegment = 0;  // Current segment index
 
-    // Define animation settings
-    const startTime = Date.now();
-    const endTime = startTime + duration;
+    function updatePosition(timestamp) {
+        if (!startTime) startTime = timestamp;  // Set the start time on the first frame
 
-    function updatePosition() {
-        const currentTime = Date.now();
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1); // Ensures the progress does not exceed 1
+        const elapsedTime = timestamp - startTime;
+        const progress = elapsedTime / duration;  // Overall progress of the animation
+        const segmentProgress = (progress * 12) % 1;  // Progress through the current segment
 
-        // Calculate new left position based on elapsed time
-        const newLeftPosition = initialLeftPosition + (timelineWidth - initialLeftPosition) * progress;
-        indicator.style.left = `${newLeftPosition}px`;
+        // Calculate the current segment based on total progress
+        currentSegment = Math.floor(progress * 12);
 
-        if (currentTime < endTime) {
-            requestAnimationFrame(updatePosition);
+        if (currentSegment > 12) currentSegment = 12;  // Limit to the total number of segments
+
+        // Calculate the current left position based on segment and progress within segment
+        const currentLeftPosition = firstMonthPosition + segmentDistance * (currentSegment + segmentProgress);
+        indicator.style.left = `${currentLeftPosition}px`;
+
+        if (currentSegment < 12) {
+            requestAnimationFrame(updatePosition);  // Continue the animation if not yet complete
         } else {
-            // Snap to the correct end position if there's any rounding error in calculations
-            indicator.style.left = `${timelineWidth - monthWidth}px`;
+            indicator.style.left = `${firstMonthPosition + totalDistance}px`;  // Ensure it ends exactly at the last position
         }
     }
 
-    updatePosition();
+    requestAnimationFrame(updatePosition);
 }
 
 

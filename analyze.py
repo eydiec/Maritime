@@ -1,4 +1,4 @@
-from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client import InfluxDBClient
 from dotenv import load_dotenv
 import pandas as pd
 import logging

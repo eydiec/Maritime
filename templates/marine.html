@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Marine Time</title>
+    <link rel="icon" href="/static/fin.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 
     <link rel="stylesheet" href="/static/marine.css">
@@ -12,8 +13,10 @@
 
 </head>
 <body>
+
     <div class="header">
-        <h1>Marine Time</h1>
+<!--        <img src="/static/fin.png" alt="Marine Time Logo" style="height: 50px; filter: grayscale(50%);">-->
+        <h1><a href="#port" style="font-family: 'Georgia', serif; text-decoration: none; color: inherit;">Marine Time</a></h1>
         <nav class="tab">
             <a href="#port">港口資訊</a>
             <a href="#analyze">指標分析</a>
@@ -36,7 +39,7 @@
 
     <div id="port" class="tabcontent">
       <h3>4大商港即時資訊&營運狀況</h3>
-        <iframe id="grafanaDashboard2" src="https://marine-time.online/grafana/d/adiii827jcnb4e/marine-time?orgId=1&1609430400000&to=1713424678805&theme=light&kiosk=tv&token={{ grafana_api_token }}" width="100%" height="900" frameborder="0"></iframe>
+        <iframe id="grafanaDashboard2" src="https://marine-time.online/grafana/d/adiii827jcnb4e/marine-time?orgId=1&1609430400000&to=1713424678805&theme=light&kiosk&token={{ grafana_api_token }}" width="100%" height="900" frameborder="0"></iframe>
 
     </div>
     <div id="analyze" class="tabcontent">
