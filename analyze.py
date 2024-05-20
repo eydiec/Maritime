@@ -1,443 +1,112 @@
-from influxdb_client import InfluxDBClient
-from dotenv import load_dotenv
-import pandas as pd
-import logging
 import os
+import logging
+import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib
 import seaborn as sns
 from io import BytesIO
 import base64
-import matplotlib
+from influxdb_client import InfluxDBClient
+from dotenv import load_dotenv
 
-matplotlib.use('Agg')  # non-interactive backend
+# Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Load environment variables
 load_dotenv()
 url = os.getenv('INFLUX_URL')
 org = os.getenv('INFLUX_ORG')
 token = os.getenv('INFLUX_TOKEN')
 bucket = os.getenv('INFLUX_BUCKET')
 
-# Connect to InfluxDB
-try:
-    client = InfluxDBClient(token=token, url=url, org=org)
-    query_api = client.query_api()
-    logging.info("successfully connect to InfluxDB")
-except Exception as e:
-    logging.error('fail to connect with InfluxDB')
+matplotlib.use('Agg')
+class InfluxDataHandler:
+    def __init__(self):
+        self.client = InfluxDBClient(token=token, url=url, org=org)
+        self.query_api = self.client.query_api()
+        self.bucket = bucket
 
+    def generate_query(self, index=None, measurement=None, field=None):
+        query = f'from(bucket: "{self.bucket}") |> range(start: -5y)'
+        if index:
+            query += (f'  |> filter(fn: (r) => r["Index"] == "{index}")\n'
+                      f'  |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)\n'
+                      f'  |> yield(name: "mean")')
+        if measurement and field:
+            query += (f'  |> filter(fn: (r) => r["_measurement"] == "{measurement}" and r["_field"] == "{field}")\n'
+                      f'  |> aggregateWindow(every: 1d, fn: sum, createEmpty: false)\n'
+                      f'  |> yield(name: "sum")')
+        return query
 
-def WCI_and_TEU():
-    try:
-        query_var1 = """
-        from(bucket: "personal_project")
-          |> range(start: -5y)
-          |> filter(fn: (r) => r["Index"] == "WCI")
-          |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
-          |> yield(name: "mean")
+    def query_data(self, query):
+        try:
+            result = self.query_api.query(query)
+            return result
+        except Exception as e:
+            logging.error(f"Failed to execute query: {str(e)}")
+            return None
 
-        """
-
-        query_var2 = """
-        from(bucket: "personal_project")
-          |> range(start: -5y)
-          |> filter(fn: (r) => r["_measurement"] == "貨櫃裝卸量" and r["_field"] == "TEU")
-          |> group(columns: ["port"])
-          |> aggregateWindow(every: 1d, fn: sum, createEmpty: false)
-          |> yield(name: "sum")
-        """
-
-        # Execute the queries
-        results_var1 = query_api.query(query_var1)
-        results_var2 = query_api.query(query_var2)
-        # Convert the results to dataframes
-
-        df_var1 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var1 for record in
+    def process_results(self, results):
+        df = pd.DataFrame(
+            [{'_time': record.get_time(), '_value': record.get_value()} for table in results for record in
              table.records])
-        df_var2 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var2 for record in
-             table.records])
+        if not df.empty:
+            df['_time'] = pd.to_datetime(df['_time'])
+            df.set_index('_time', inplace=True)
+            df = df.resample('M').sum()
+        return df
 
-        df_var1['_time'] = pd.to_datetime(df_var1['_time'])
-        df_var1.set_index('_time', inplace=True)
-        df_var1 = df_var1.resample('M').sum()
-        df_var2['_time'] = pd.to_datetime(df_var2['_time'])
-        df_var2.set_index('_time', inplace=True)
-        df_var2 = df_var2.resample('M').sum()
 
-        # monthly_data.reset_index(inplace=True)# Reset the index if '_time' back as a column
-        # print(df_var1)
-        # print(df_var2)
-        logging.info("WCI_and_TEU Queries executed successfully")
-        df_combined = pd.merge(df_var1, df_var2, left_index=True, right_index=True, how='inner',
-                               suffixes=('_var1', '_var2'))
-        correlation = df_combined['_value_var1'].corr(df_combined['_value_var2'])
-        # logging.info(f"Pearson Correlation Coefficient: {correlation}")  # -0.5
+class DataPlotter:
+    @staticmethod
+    def plot_data(df, title, x_label, y_label):
         plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=df_combined, x='_value_var1', y='_value_var2', sizes=(30, 300))
-        sns.regplot(data=df_combined, x='_value_var1', y='_value_var2', scatter=True, color='blue') #regression line
+        sns.scatterplot(data=df, x=x_label, y=y_label, s=5)  # reduce marker size
+        sns.regplot(data=df, x=x_label, y=y_label, scatter=True, color='blue')  # regression line
+        plt.title(title, fontsize=20, fontweight='bold', pad=20)
+        plt.xlabel(x_label, fontsize=14)
+        plt.ylabel(y_label, fontsize=14)
+        plt.grid(True, linestyle='--', linewidth=0.5)  # Lighter grid lines
 
-        plt.title('WCI Index vs. TEU', fontsize=20,fontweight='bold', pad=20)
-        plt.xlabel('WCI Index', fontsize=14)
-        plt.ylabel('TEU (Container Throughput)', fontsize=14)
-        plt.grid(True)
-        # plt.legend(title='WCI Index')
-
-        plt.text(x=max(df_combined['_value_var1']), y=max(df_combined['_value_var2']),
-                 s=f'Pearson Correlation: {df_combined["_value_var1"].corr(df_combined["_value_var2"]):.2f}',
+        correlation = df[x_label].corr(df[y_label])
+        plt.text(x=max(df[x_label]), y=max(df[y_label]),
+                 s=f'Pearson Correlation: {correlation:.2f}',
                  horizontalalignment='right', verticalalignment='bottom', color='blue', size=12,
-                 bbox=dict(facecolor='lightblue', alpha=1, edgecolor='lightblue', boxstyle='round,pad=0.5'))
+                 bbox=dict(facecolor='lightblue', alpha=0.8, edgecolor='lightblue', boxstyle='round,pad=0.5'))
 
-        # convert to PNG
+        return plt
+
+    @staticmethod
+    def save_plot(plt):
         img = BytesIO()
-        plt.savefig(img, format='png')
+        plt.savefig(img, format='png', dpi=80)  # Reduce DPI for faster saving
         img.seek(0)
         plot_url = base64.b64encode(img.getvalue()).decode('utf8')
         img.close()
-        # print( plot_url)
         return plot_url
 
 
-    except Exception as e:
-        logging.error(f'Failed to execute queries: {str(e)}')
+def plot_pair(handler, query1, query2, title, x_label, y_label):
+    results1 = handler.query_data(query1)
+    results2 = handler.query_data(query2)
 
+    df1 = handler.process_results(results1)
+    df2 = handler.process_results(results2)
 
-def FBX_and_TEU():
-    try:
-        query_var1 = """
-        from(bucket: "personal_project")
-          |> range(start: -5y)
-          |> filter(fn: (r) => r["Index"] == "FBX")
-          |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
-          |> yield(name: "mean")
+    if df1.empty or df2.empty:
+        logging.error(f"No data found for the queries: {query1}, {query2}")
+        return None
 
-        """
+    df_combined = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
+    df_combined.columns = [x_label, y_label]
+    # Plot the data
+    plotter = DataPlotter()
+    plt = plotter.plot_data(df_combined, title, x_label, y_label)
+    plot_url = plotter.save_plot(plt)
 
-        query_var2 = """
-        from(bucket: "personal_project")
-          |> range(start: -5y)
-          |> filter(fn: (r) => r["_measurement"] == "貨櫃裝卸量" and r["_field"] == "TEU")
-          |> group(columns: ["port"])
-          |> aggregateWindow(every: 1d, fn: sum, createEmpty: false)
-          |> yield(name: "sum")
-        """
+    logging.info(f"{title} queries executed successfully")
 
-        # Execute the queries
-        results_var1 = query_api.query(query_var1)
-        results_var2 = query_api.query(query_var2)
-        # Convert the results to dataframes
+    # plt.show()
 
-        df_var1 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var1 for record in
-             table.records])
-        df_var2 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var2 for record in
-             table.records])
-
-        df_var1['_time'] = pd.to_datetime(df_var1['_time'])
-        df_var1.set_index('_time', inplace=True)
-        df_var1 = df_var1.resample('M').sum()
-        df_var2['_time'] = pd.to_datetime(df_var2['_time'])
-        df_var2.set_index('_time', inplace=True)
-        df_var2 = df_var2.resample('M').sum()
-
-        # monthly_data.reset_index(inplace=True)# Reset the index if '_time' back as a column
-        # print(df_var1)
-        # print(df_var2)
-        logging.info("FBX_and_TEU Queries executed successfully")
-        df_combined = pd.merge(df_var1, df_var2, left_index=True, right_index=True, how='inner',
-                               suffixes=('_var1', '_var2'))
-        correlation = df_combined['_value_var1'].corr(df_combined['_value_var2'])
-        # logging.info(f"Pearson Correlation Coefficient: {correlation}")  # -0.5
-        plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=df_combined, x='_value_var1', y='_value_var2')
-        sns.regplot(data=df_combined, x='_value_var1', y='_value_var2', scatter=True, color='blue') #regression line
-
-
-        plt.title('FBX Index vs. TEU', fontsize=20,fontweight='bold', pad=20)
-        plt.xlabel('FBX Index')
-        plt.ylabel('TEU (Container Throughput)')
-        plt.grid(True)
-        plt.text(x=max(df_combined['_value_var1']), y=max(df_combined['_value_var2']),
-                 s=f'Pearson Correlation: {df_combined["_value_var1"].corr(df_combined["_value_var2"]):.2f}',
-                 horizontalalignment='right', verticalalignment='bottom',
-                 color='blue', size=12, bbox=dict(facecolor='lightblue', alpha=0.8, edgecolor='lightblue', boxstyle='round,pad=0.5'))
-
-        # convert to PNG
-        img = BytesIO()
-        plt.savefig(img, format='png')
-        img.seek(0)
-        plot_url_2 = base64.b64encode(img.getvalue()).decode('utf8')
-        img.close()
-        # print( plot_url_2)
-        return plot_url_2
-
-
-    except Exception as e:
-        logging.error(f'Failed to execute queries: {str(e)}')
-
-
-def BDI_and_Cargo():
-    try:
-        query_var1 = """
-        from(bucket: "personal_project")
-          |> range(start: -5y)
-          |> filter(fn: (r) => r["Index"] == "BDI")
-          |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
-          |> yield(name: "mean")
-
-        """
-
-        query_var2 = """
-        from(bucket: "personal_project")
-          |> range(start: -5y)
-          |> filter(fn: (r) => r["_measurement"] == "貨物裝卸量" and r["_field"] == "charge_ton")
-          |> group(columns: ["port"])
-          |> aggregateWindow(every: 1d, fn: sum, createEmpty: false)
-          |> yield(name: "sum")
-        """
-
-        # Execute the queries
-        results_var1 = query_api.query(query_var1)
-        results_var2 = query_api.query(query_var2)
-        # Convert the results to dataframes
-
-        df_var1 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var1 for record in
-             table.records])
-        df_var2 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var2 for record in
-             table.records])
-
-        df_var1['_time'] = pd.to_datetime(df_var1['_time'])
-        df_var1.set_index('_time', inplace=True)
-        df_var1 = df_var1.resample('M').sum()
-        df_var2['_time'] = pd.to_datetime(df_var2['_time'])
-        df_var2.set_index('_time', inplace=True)
-        df_var2 = df_var2.resample('M').sum()
-
-        # monthly_data.reset_index(inplace=True)# Reset the index if '_time' back as a column
-        # print(df_var1)
-        # print(df_var2)
-        logging.info("BDI_and_Cargo Queries executed successfully")
-        df_combined = pd.merge(df_var1, df_var2, left_index=True, right_index=True, how='inner',
-                               suffixes=('_var1', '_var2'))
-        correlation = df_combined['_value_var1'].corr(df_combined['_value_var2'])
-        # logging.info(f"Pearson Correlation Coefficient: {correlation}")  # -0.5
-        plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=df_combined, x='_value_var1', y='_value_var2')
-        sns.regplot(data=df_combined, x='_value_var1', y='_value_var2', scatter=True, color='blue') #regression line
-
-
-        plt.title('BDI Index vs. Dry Material', fontsize=20,fontweight='bold', pad=20)
-        plt.xlabel('BDI Index')
-        plt.ylabel('Dry Material Throughput')
-        plt.grid(True)
-        plt.text(x=max(df_combined['_value_var1']), y=max(df_combined['_value_var2']),
-                 s=f'Pearson Correlation: {df_combined["_value_var1"].corr(df_combined["_value_var2"]):.2f}',
-                 horizontalalignment='right', verticalalignment='bottom',
-                 color='blue', size=12, bbox=dict(facecolor='lightblue', alpha=0.8, edgecolor='lightblue', boxstyle='round,pad=0.5'))
-
-        # convert to PNG
-        img = BytesIO()
-        plt.savefig(img, format='png')
-        img.seek(0)
-        plot_url_2 = base64.b64encode(img.getvalue()).decode('utf8')
-        img.close()
-        # print( plot_url_2)
-        return plot_url_2
-
-
-    except Exception as e:
-        logging.error(f'Failed to execute queries: {str(e)}')
-
-
-def stock_and_TEU_and_cargo():
-    try:
-        query_var1 = """
-           from(bucket: "personal_project")
-             |> range(start: -5y)
-             |> filter(fn: (r) => r["Index"] == "台股航運指數")
-             |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
-             |> yield(name: "mean")
-
-           """
-
-        query_var2 = """
-           from(bucket: "personal_project")
-             |> range(start: -5y)
-             |> filter(fn: (r) => r["_measurement"] == "貨物裝卸量" and r["_field"] == "charge_ton")
-             |> group(columns: ["port"])
-             |> aggregateWindow(every: 1d, fn: sum, createEmpty: false)
-             |> yield(name: "sum")
-           """
-
-        query_var3 = """
-                from(bucket: "personal_project")
-                  |> range(start: -5y)
-                  |> filter(fn: (r) => r["_measurement"] == "貨櫃裝卸量" and r["_field"] == "TEU")
-                  |> group(columns: ["port"])
-                  |> aggregateWindow(every: 1d, fn: sum, createEmpty: false)
-                  |> yield(name: "sum")
-                """
-
-        # Execute the queries
-        results_var1 = query_api.query(query_var1)
-        results_var2 = query_api.query(query_var2)
-        results_var3 = query_api.query(query_var3)
-        # Convert the results to dataframes
-        df_var1 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var1 for record in
-             table.records])
-        df_var2 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var2 for record in
-             table.records])
-        df_var3 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var3 for record in
-             table.records])
-
-        df_var1['_time'] = pd.to_datetime(df_var1['_time'])
-        df_var1.set_index('_time', inplace=True)
-        df_var1 = df_var1.resample('M').sum()
-        df_var2['_time'] = pd.to_datetime(df_var2['_time'])
-        df_var2.set_index('_time', inplace=True)
-        df_var2 = df_var2.resample('M').sum()
-        df_var3['_time'] = pd.to_datetime(df_var3['_time'])
-        df_var3.set_index('_time', inplace=True)
-        df_var3 = df_var3.resample('M').sum()
-
-        # monthly_data.reset_index(inplace=True)# Reset the index if '_time' back as a column
-        # print(df_var1)
-        # print(df_var2)
-        logging.info("Queries executed successfully")
-
-        # Stock Index vs. TEU
-        df_combined = pd.merge(df_var1, df_var2, left_index=True, right_index=True, how='inner',
-                               suffixes=('_var1', '_var2'))
-        correlation = df_combined['_value_var1'].corr(df_combined['_value_var2'])
-        # logging.info(f"Pearson Correlation Coefficient: {correlation}")  # -0.5
-        plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=df_combined, x='_value_var1', y='_value_var2')
-        sns.regplot(data=df_combined, x='_value_var1', y='_value_var2', scatter=True, color='blue') #regression line
-
-
-        plt.title('Stock Index vs. Container Throughput', fontsize=20,fontweight='bold', pad=20)
-        plt.xlabel('Stock Index')
-        plt.ylabel('TEU (Container Throughput)')
-        plt.grid(True)
-        plt.text(x=max(df_combined['_value_var1']), y=max(df_combined['_value_var2']),
-                 s=f'Pearson Correlation: {df_combined["_value_var1"].corr(df_combined["_value_var2"]):.2f}',
-                 horizontalalignment='right', verticalalignment='bottom',
-                 color='blue', size=12, bbox=dict(facecolor='lightblue', alpha=0.8, edgecolor='lightblue', boxstyle='round,pad=0.5'))
-        # convert to PNG
-        img = BytesIO()
-        plt.savefig(img, format='png')
-        img.seek(0)
-        plot_url_4 = base64.b64encode(img.getvalue()).decode('utf8')
-        img.close()
-
-        # Stock Index vs. Cargo Volume
-        df_combined = pd.merge(df_var1, df_var3, left_index=True, right_index=True, how='inner',
-                               suffixes=('_var1', '_var2'))
-        correlation = df_combined['_value_var1'].corr(df_combined['_value_var2'])
-        # logging.info(f"Pearson Correlation Coefficient: {correlation}")  # -0.5
-        plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=df_combined, x='_value_var1', y='_value_var2')
-        sns.regplot(data=df_combined, x='_value_var1', y='_value_var2', scatter=True, color='blue') #regression line
-
-        plt.title('Stock Index vs. Cargo Volume', fontsize=20,fontweight='bold', pad=20)
-        plt.xlabel('Stock Index')
-        plt.ylabel('Cargo Volume')
-        plt.grid(True)
-        plt.text(x=max(df_combined['_value_var1']), y=max(df_combined['_value_var2']),
-                 s=f'Pearson Correlation: {df_combined["_value_var1"].corr(df_combined["_value_var2"]):.2f}',
-                 horizontalalignment='right', verticalalignment='bottom',
-                 color='blue', size=12, bbox=dict(facecolor='lightblue', alpha=0.8, edgecolor='lightblue', boxstyle='round,pad=0.5'))
-        # convert to PNG
-        img = BytesIO()
-        plt.savefig(img, format='png')
-        img.seek(0)
-        plot_url_5 = base64.b64encode(img.getvalue()).decode('utf8')
-        img.close()
-
-        return plot_url_4, plot_url_5
-
-
-    except Exception as e:
-        logging.error(f'Failed to execute queries: {str(e)}')
-
-def export_value_and_stock():
-    try:
-        query_var1 = """
-        from(bucket: "personal_project")
-          |> range(start: -5y)
-          |> filter(fn: (r) => r["Index"] == "TW_ExportValue")
-          |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
-          |> yield(name: "mean")
-
-        """
-
-        query_var2 = """
-        from(bucket: "personal_project")
-          |> range(start: -5y)
-          |> filter(fn: (r) => r["Index"] == "台股航運指數")
-          |> aggregateWindow(every: 1d, fn: sum, createEmpty: false)
-          |> yield(name: "sum")
-        """
-
-        # Execute the queries
-        results_var1 = query_api.query(query_var1)
-        results_var2 = query_api.query(query_var2)
-        # Convert the results to dataframes
-
-        df_var1 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var1 for record in
-             table.records])
-        df_var2 = pd.DataFrame(
-            [{'_time': record.get_time(), '_value': record.get_value()} for table in results_var2 for record in
-             table.records])
-
-        df_var1['_time'] = pd.to_datetime(df_var1['_time'])
-        df_var1.set_index('_time', inplace=True)
-        df_var1 = df_var1.resample('M').sum()
-        df_var2['_time'] = pd.to_datetime(df_var2['_time'])
-        df_var2.set_index('_time', inplace=True)
-        df_var2 = df_var2.resample('M').sum()
-
-        # monthly_data.reset_index(inplace=True)# Reset the index if '_time' back as a column
-        # print(df_var1)
-        # print(df_var2)
-        logging.info("export_value_and_stock Queries executed successfully")
-        df_combined = pd.merge(df_var1, df_var2, left_index=True, right_index=True, how='inner',
-                               suffixes=('_var1', '_var2'))
-        correlation = df_combined['_value_var1'].corr(df_combined['_value_var2'])
-        # logging.info(f"Pearson Correlation Coefficient: {correlation}")  # -0.5
-        plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=df_combined, x='_value_var1', y='_value_var2')
-        sns.regplot(data=df_combined, x='_value_var1', y='_value_var2', scatter=True, color='blue') #regression line
-
-
-        plt.title('TW Export Value vs. Stock Index', fontsize=20,fontweight='bold', pad=20)
-        plt.xlabel('TW Export Value')
-        plt.ylabel('Stock Index')
-        plt.grid(True)
-        plt.text(x=max(df_combined['_value_var1']), y=max(df_combined['_value_var2']),
-                 s=f'Pearson Correlation: {df_combined["_value_var1"].corr(df_combined["_value_var2"]):.2f}',
-                 horizontalalignment='right', verticalalignment='bottom',
-                 color='blue', size=12, bbox=dict(facecolor='lightblue', alpha=0.8, edgecolor='lightblue', boxstyle='round,pad=0.5'))
-
-        # convert to PNG
-        img = BytesIO()
-        plt.savefig(img, format='png')
-        img.seek(0)
-        plot_url_2 = base64.b64encode(img.getvalue()).decode('utf8')
-        img.close()
-        # print( plot_url_2)
-        return plot_url_2
-
-
-    except Exception as e:
-        logging.error(f'Failed to execute queries: {str(e)}')
-
+    return plot_url
 
