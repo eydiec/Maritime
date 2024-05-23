@@ -1,14 +1,35 @@
 # Marine Time
-[Website](https://marine-time.online) |  [Demo Video](https://www.youtube.com/watch?v=6bKpNwKqo4E)
-![Marine Time Architecture](readme-img/architechture.png)
+[Website](https://marine-time.online) |  [Introdcution Video](https://www.youtube.com/watch?v=6bKpNwKqo4E)
 ## Overview
-***
-A comprehensive platform providing daily port information and detailed market trend analytics from international indexes. The platform features an animated map built with Leaflet to visualize data over a rolling 12-month period.
+
+A platform providing daily port information and detailed market trend analytics from international indexes. The platform features an animated map built with Leaflet to visualize data over a rolling 12-month period.
+## Objective
+Marine Time aims to gather comprehensive information about the shipping industry, bringing together a wealth of data and insights in one platform. 
+This website is a heartfelt tribute to my beloved grandpa, who was a captain throughout his whole life and became an angel during the development.
+Through this endeavor, I honor his memory and his enduring influence on my life.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Objective](#objective)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Demo](#demo)
+- [Introduction Video](#introduction-video)
+- [Architecture](#architecture)
+  - [Component Specification](#component-specification)
+- [Data Pipeline Details](#data-pipeline-details)
+- [Web Server Details](#web-server-details)
+- [Monitoring](#monitoring)
+- [Deployment](#deployment)
+- [Contact](#contact)
+
+
 
 ## Features
 
-- **Port Information**: 
-  - Daily port congestion updates, on-berth ships
+- **Port Information Visualization**: 
+  - Daily port congestion and on-berth ships update
   - International indexes: WCI, FBX, BDI (weekly updates)
   - Taiwan indexes: Taiwan Ship Stock Index, Taiwan Export Value Changes (weekly updates)
   - Monthly ports operation status
@@ -17,12 +38,32 @@ A comprehensive platform providing daily port information and detailed market tr
 
 ## Technologies Used
 
-- **Frontend**: Leaflet for interactive map visualization
-- **Backend**: AWS Lambda, Flask, Docker
-- **Data Storage**: Amazon S3, InfluxDB
+- **Frontend**: Leaflet, Grafana, Matplotlib
+- **Programming Languages**: Python, JavaScript
+- **Framework**: Flask
+- **Tools**: Docker, Selenium
+- **Database**: InfluxDB
 - **Monitoring**: AWS CloudWatch, Prometheus, Telegraf
+- **Cloud Service (AWS)**: EC2, Lambda, ALB, ASG, CloudWatch, S3, Route53
 
-## Data Pipeline
+## Demo
+
+## Introduction Video
+[Introdcution Video](https://www.youtube.com/watch?v=6bKpNwKqo4E)
+
+## Architecture
+![Marine Time Architecture](readme-img/architechture.png)
+Here's a brief overview of Marine Time's architecture:
+### Component Specification
+- **InfluxDB**: CPU: 2 vCPUs, Memory: 4 GB
+- **Grafana**: CPU: 1 vCPU, Memory: 2 GB
+- **Python Application**: CPU: 1 vCPU, Memory: 2 GB
+- **Prometheus**: CPU: 1 vCPU, Memory: 2 GB
+- **Node Exporter**: CPU: 0.5 vCPU, Memory: 0.5 GB
+- **Telegraf**: CPU: 0.5 vCPU, Memory: 0.5 GB
+
+
+## Data Pipeline Details
 
 - **Data Source**:
   - Maritime Port Bureau - Ports Operation Status <span style="font-size: smaller; color: gray;">(update frequency: daily, monthly)</span>
@@ -34,16 +75,15 @@ A comprehensive platform providing daily port information and detailed market tr
 - **ETL**:
    - **Extract**: AWS Lambda (cron-based schedule + Selenium)
    - **Load**: Amazon S3
-  - **Transform**: event-triggered AWS Lambda (Python) to write transformed data into InfluxDB. 
-  
+   - **Transform**: event-triggered AWS Lambda (Python) to write transformed data into InfluxDB. 
 
-## Web Server
+## Web Server Details
 
 - **API Deployment**:
-  - Deployed RESTful API using Flask on EC2 instances.
+  - Deployed RESTful API using Flask on EC2 instances
 - **Load Balancing and Scaling**:
-  - Utilized an Application Load Balancer (ALB) to distribute incoming traffic.
-  - Implemented an Auto Scaling Group (ASG) to adjust the number of EC2 instances based on CPU utilization, ensuring scalability and preventing server overload.
+  - Application Load Balancer (ALB) to distribute incoming traffic
+  - Auto Scaling Group (ASG) to adjust EC2 instances based on CPU utilization
 
 ## Monitoring
 
@@ -54,6 +94,9 @@ A comprehensive platform providing daily port information and detailed market tr
 - **Data Integrity Checks**:
   - Conducted monthly data integrity checks by querying data from S3 and InfluxDB to ensure accuracy and consistency.
 
+## Deployment
+
+
 ## Contact
-Eydie Cheng
+[Eydie Cheng](mailto:eydie.cheng@gmail.com)
 
