@@ -1,5 +1,6 @@
 # Marine Time
-![Marine Time Architecture](image/architechture.png)
+![Marine Time Architecture](<img width="832" alt="architechture" src="https://github.com/eydiec/Maritime/assets/137089509/dc1f353d-54fb-4c4a-b5be-68007fcef873">
+)
 ## Overview
 A comprehensive platform providing daily port information and detailed market trend analytics from international indexes. The platform features an animated map built with Leaflet to visualize data over a rolling 12-month period.
 
