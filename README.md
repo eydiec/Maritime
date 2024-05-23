@@ -54,20 +54,22 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
 
 ## Architecture
 ![Marine Time Architecture](readme-img/architechture.png)
-Here's a brief overview of Marine Time's architecture:
-
-
-
 
 ### Data Pipeline Detail
 
 - **Data Source**:
-  - Maritime Port Bureau - Ports Operation Status <span style="font-size: smaller; color: gray;">(update frequency: daily, monthly)</span>
-  - Drewry - World Container Index (WCI) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
-  - Freightos - Freightos Baltic Index (FBX) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
-  - Baltic Exchange - Baltic Dry Index (BDI) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
-  - Taiwan Stock Exchange - Shipping Industry Index <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
-  - Ministry of Finance - Taiwan Export Value <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
+  - Maritime Port Bureau - Ports Operation Status (商港營運狀況)
+    - update frequency: daily, monthly
+  - Drewry - World Container Index (WCI) (航運指標)
+    - update frequency: weekly
+  - Freightos - Freightos Baltic Index (FBX) (航運指標)
+    - update frequency: weekly
+  - Baltic Exchange - Baltic Dry Index (BDI)(航運指標)
+    - update frequency: weekly
+  - Taiwan Stock Exchange - Shipping Industry Index (航運業類指數)
+    - update frequency: weekly
+  - Ministry of Finance - Taiwan Export Value (台灣出口值)
+    - update frequency: weekly
 - **Data Collection**:
   - Python & Selenium: Selenium is used for web scraping to collect the necessary data from sources
   - AWS Lambda: Automated data collection using AWS Lambda on a scheduled basis (cron-based schedule)
