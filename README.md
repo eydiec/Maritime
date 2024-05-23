@@ -70,12 +70,12 @@ Here's a brief overview of Marine Time's architecture:
   - Ministry of Finance - Taiwan Export Value <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
 - **Data Collection**:
   - Python & Selenium: Selenium is used for web scraping to collect the necessary data from sources
-  - AWS Lambda: The data collection is automated using AWS Lambda, which runs the Python script on a scheduled basis (cron-based schedule)
+  - AWS Lambda: Automated data collection using AWS Lambda on a scheduled basis (cron-based schedule)
 - **Data Storage**:
   - Amazon S3 (Raw Data Layer): Raw data collected by AWS Lambda is stored in Amazon S3
 - **Data Transformation**:
   - AWS Lambda: Another Lambda triggered by EventBridge when new data is stored into S3
-  - InfluxDB (Structured Data Layer): The transformed data is written into InfluxDB, a time-series database optimized for handling large volumes of time-stamped data.
+  - InfluxDB (Structured Data Layer): Transformed data is written into InfluxDB, a time-series database optimized for handling large volumes of time-stamped data
 ### Web Server Detail
 
 - **API Deployment**:
