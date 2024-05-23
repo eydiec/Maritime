@@ -22,7 +22,7 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
   - [Data Pipeline Detail](#data-pipeline-detail)
   - [Web Server Detail](#web-server-detail)
 - [Monitoring](#monitoring)
-- [Deployment](#deployment)
+
 - [Contact](#contact)
 
 
@@ -31,10 +31,12 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
 
 - **Port Information Visualization**: 
   - Daily port congestion and on-berth ships update
-  - International indexes: WCI, FBX, BDI (weekly updates)
-  - Taiwan indexes: Taiwan Ship Stock Index, Taiwan Export Value Changes (weekly updates)
+  - International indexes: WCI, FBX, BDI 
+  - Taiwan indexes: Taiwan Ship Stock Index, Taiwan Export Value Changes 
   - Monthly ports operation status
-- **Ship Industry Analytics**: Analyze detailed market trends from various international indexes.
+- **Ship Industry Analytics**: 
+  - **Static Analysis**: Analyze historical data and trends from various international indexes.
+  - **Business Analysis**: Gain insights into current market conditions and future trends to inform business decisions.
 - **Animated Map**: Visualize data trends over 12 months using a dynamic map.
 
 ## Technologies Used
@@ -48,7 +50,12 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
 - **Cloud Service (AWS)**: EC2, Lambda, EventBridge, ALB, ASG, CloudWatch, S3, Route53
 
 ## Demo
-
+### Port Daily Update 
+![Port Daily Update](readme-img/port.png)(captured on May 23, 2024)
+### Port Operation Update
+![Port Operation Update](readme-img/operation.gif)
+### International Indexes 
+![International Indexes](readme-img/index.png)
 ## Introduction Video
 [Introdcution Video](https://www.youtube.com/watch?v=6bKpNwKqo4E)
 
@@ -66,7 +73,7 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
     - update frequency: weekly
   - Baltic Exchange - Baltic Dry Index (BDI)(航運指標)
     - update frequency: weekly
-  - Taiwan Stock Exchange - Shipping Industry Index (航運業類指數)
+  - Taiwan Stock Exchange - Shipping Industry Index (航運業類指數) 
     - update frequency: weekly
   - Ministry of Finance - Taiwan Export Value (台灣出口值)
     - update frequency: weekly
@@ -105,9 +112,6 @@ Marine Time employs Prometheus  for monitoring and alerting. Metrics are collect
   ![monitor2](readme-img/monitor2.png)
 - **Data Integrity Checks**:
   - Conducted monthly data integrity checks by querying data from S3 and InfluxDB to ensure accuracy and consistency.
-
-## Deployment
-
 
 ## Contact
 [Eydie Cheng](mailto:eydie.cheng@gmail.com)
