@@ -17,6 +17,7 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
 - [Demo](#demo)
 - [Introduction Video](#introduction-video)
 - [Architecture](#architecture)
+  - [Server/DB Monitoring Architecture](#serverdb-monitoring-architecture)
   - [Component Specification](#component-specification)
 - [Data Pipeline Details](#data-pipeline-details)
 - [Web Server Details](#web-server-details)
@@ -54,6 +55,11 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
 ## Architecture
 ![Marine Time Architecture](readme-img/architechture.png)
 Here's a brief overview of Marine Time's architecture:
+
+### Server/DB Monitoring Architecture
+![Monitoring Architecture](readme-img/monitor_arch.png)
+Marine Time employs Prometheus  for monitoring and alerting. Metrics are collected from various sources such as EC2 instances and InfluxDB. Pulling data from sources, Prometheus then stores these metrics and allows querying via Grafana for visualization. When CPU usage exceeding 70% or memory usage exceeding 80%,  Prometheus triggers alerts which are managed by Alert Manager. Alert Manager can notify users through email, ensuring critical issues are promptly addressed.
+
 ### Component Specification
 - **InfluxDB**: CPU: 2 vCPUs, Memory: 4 GB
 - **Grafana**: CPU: 1 vCPU, Memory: 2 GB
