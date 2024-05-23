@@ -23,7 +23,7 @@ A comprehensive platform providing daily port information and detailed market tr
 - **Monitoring**: AWS CloudWatch, Prometheus, Telegraf
 
 ## Data Pipeline
-***
+
 - **Data Source**:
   - Maritime Port Bureau - Ports Operation Status <span style="font-size: smaller; color: gray;">(update frequency: daily, monthly)</span>
   - Drewry - World Container Index (WCI) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
@@ -38,7 +38,7 @@ A comprehensive platform providing daily port information and detailed market tr
   
 
 ## Web Server
-***
+
 - **API Deployment**:
   - Deployed RESTful API using Flask on EC2 instances.
 - **Load Balancing and Scaling**:
@@ -46,11 +46,11 @@ A comprehensive platform providing daily port information and detailed market tr
   - Implemented an Auto Scaling Group (ASG) to adjust the number of EC2 instances based on CPU utilization, ensuring scalability and preventing server overload.
 
 ## Monitoring
-***
+
 - **Real-Time Monitoring**:
   - Implemented real-time monitoring solutions using AWS CloudWatch, Prometheus, and Telegraf to ensure the system's performance and reliability by monitoring the server and database.
-  - ![img.png](img.png)
-  - ![img_1.png](img_1.png)
+  - ![monitor1](readme-img/monitor1)
+  - ![monitor2](readme-img/monitor2)
 - **Data Integrity Checks**:
   - Conducted monthly data integrity checks by querying data from S3 and InfluxDB to ensure accuracy and consistency.
 
