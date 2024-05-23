@@ -7,8 +7,8 @@ A comprehensive platform providing daily port information and detailed market tr
 - **Port Information**: 
   - Daily port congestion updates, on-berth ships
   - International indexes: WCI, FBX, BDI (weekly updates)
-  - Taiwan indexes: 台灣航運指數, Taiwan Export Value Changes (weekly updates)
-  - Monthly port operation status
+  - Taiwan indexes: Taiwan Ship Stock Index, Taiwan Export Value Changes (weekly updates)
+  - Monthly ports operation status
 - **Market Trend Analytics**: Analyze detailed market trends from various international indexes.
 - **Animated Map**: Visualize data trends over 12 months using a dynamic map.
 
