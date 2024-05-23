@@ -19,8 +19,8 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
 - [Architecture](#architecture)
   - [Server/DB Monitoring Architecture](#serverdb-monitoring-architecture)
   - [Component Specification](#component-specification)
-- [Data Pipeline Details](#data-pipeline-details)
-- [Web Server Details](#web-server-details)
+  - [Data Pipeline Detail](#data-pipeline-detail)
+  - [Web Server Detail](#web-server-detail)
 - [Monitoring](#monitoring)
 - [Deployment](#deployment)
 - [Contact](#contact)
@@ -45,7 +45,7 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
 - **Tools**: Docker, Selenium
 - **Database**: InfluxDB
 - **Monitoring**: AWS CloudWatch, Prometheus, Telegraf
-- **Cloud Service (AWS)**: EC2, Lambda, ALB, ASG, CloudWatch, S3, Route53
+- **Cloud Service (AWS)**: EC2, Lambda, EventBridge, ALB, ASG, CloudWatch, S3, Route53
 
 ## Demo
 
@@ -55,6 +55,34 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
 ## Architecture
 ![Marine Time Architecture](readme-img/architechture.png)
 Here's a brief overview of Marine Time's architecture:
+
+
+
+
+### Data Pipeline Detail
+
+- **Data Source**:
+  - Maritime Port Bureau - Ports Operation Status <span style="font-size: smaller; color: gray;">(update frequency: daily, monthly)</span>
+  - Drewry - World Container Index (WCI) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
+  - Freightos - Freightos Baltic Index (FBX) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
+  - Baltic Exchange - Baltic Dry Index (BDI) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
+  - Taiwan Stock Exchange - Shipping Industry Index <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
+  - Ministry of Finance - Taiwan Export Value <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
+- **Data Collection**:
+  - Python & Selenium: Selenium is used for web scraping to collect the necessary data from sources
+  - AWS Lambda: The data collection is automated using AWS Lambda, which runs the Python script on a scheduled basis (cron-based schedule)
+- **Data Storage**:
+  - Amazon S3 (Raw Data Layer): Raw data collected by AWS Lambda is stored in Amazon S3
+- **Data Transformation**:
+  - AWS Lambda: Another Lambda triggered by EventBridge when new data is stored into S3
+  - InfluxDB (Structured Data Layer): The transformed data is written into InfluxDB, a time-series database optimized for handling large volumes of time-stamped data.
+### Web Server Detail
+
+- **API Deployment**:
+  - Deployed RESTful API using Flask on EC2 instances
+- **Load Balancing and Scaling**:
+  - Application Load Balancer (ALB) to distribute incoming traffic
+  - Auto Scaling Group (ASG) to adjust EC2 instances based on CPU utilization
 
 ### Server/DB Monitoring Architecture
 ![Monitoring Architecture](readme-img/monitor_arch.png)
@@ -67,30 +95,6 @@ Marine Time employs Prometheus  for monitoring and alerting. Metrics are collect
 - **Prometheus**: CPU: 1 vCPU, Memory: 2 GB
 - **Node Exporter**: CPU: 0.5 vCPU, Memory: 0.5 GB
 - **Telegraf**: CPU: 0.5 vCPU, Memory: 0.5 GB
-
-
-## Data Pipeline Details
-
-- **Data Source**:
-  - Maritime Port Bureau - Ports Operation Status <span style="font-size: smaller; color: gray;">(update frequency: daily, monthly)</span>
-  - Drewry - World Container Index (WCI) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
-  - Freightos - Freightos Baltic Index (FBX) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
-  - Baltic Exchange - Baltic Dry Index (BDI) <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
-  - Taiwan Stock Exchange - Shipping Industry Index <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
-  - Ministry of Finance - Taiwan Export Value <span style="font-size: smaller; color: gray;">(update frequency: weekly)</span>
-- **ETL**:
-   - **Extract**: AWS Lambda (cron-based schedule + Selenium)
-   - **Load**: Amazon S3
-   - **Transform**: event-triggered AWS Lambda (Python) to write transformed data into InfluxDB. 
-
-## Web Server Details
-
-- **API Deployment**:
-  - Deployed RESTful API using Flask on EC2 instances
-- **Load Balancing and Scaling**:
-  - Application Load Balancer (ALB) to distribute incoming traffic
-  - Auto Scaling Group (ASG) to adjust EC2 instances based on CPU utilization
-
 ## Monitoring
 
 - **Real-Time Monitoring**:
