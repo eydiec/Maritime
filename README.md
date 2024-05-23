@@ -12,7 +12,7 @@ A comprehensive platform providing daily port information and detailed market tr
   - International indexes: WCI, FBX, BDI (weekly updates)
   - Taiwan indexes: Taiwan Ship Stock Index, Taiwan Export Value Changes (weekly updates)
   - Monthly ports operation status
-- **Market Trend Analytics**: Analyze detailed market trends from various international indexes.
+- **Ship Industry Analytics**: Analyze detailed market trends from various international indexes.
 - **Animated Map**: Visualize data trends over 12 months using a dynamic map.
 
 ## Technologies Used
@@ -49,10 +49,11 @@ A comprehensive platform providing daily port information and detailed market tr
 
 - **Real-Time Monitoring**:
   - Implemented real-time monitoring solutions using AWS CloudWatch, Prometheus, and Telegraf to ensure the system's performance and reliability by monitoring the server and database.
-  - ![monitor1](readme-img/monitor1)
-  - ![monitor2](readme-img/monitor2)
+  ![monitor1](readme-img/monitor1.png)
+  ![monitor2](readme-img/monitor2.png)
 - **Data Integrity Checks**:
   - Conducted monthly data integrity checks by querying data from S3 and InfluxDB to ensure accuracy and consistency.
 
-## Getting Started
+## Contact
+Eydie Cheng
 
