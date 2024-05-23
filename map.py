@@ -133,8 +133,6 @@ except Exception as e:
 
 
 def geo_json():
-
-
     ship_geodata = 'data/ship1yr.json'
     with open(ship_geodata,'r') as file:
         geojson = json.load(file)

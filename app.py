@@ -46,9 +46,6 @@ def home():
 
 @app.route("/map")
 def map():
-    # ships_geojson = geo_json()
-    #
-    # ship_map(ships_geojson)
     return render_template("map.html")
 
 

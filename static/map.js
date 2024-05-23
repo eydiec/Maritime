@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     await fetchBoatData();
     renderMonths();
     setupMap();
-    initializePage();
+
 });
 
 let monthlyBoatData = {};
@@ -12,6 +12,7 @@ async function fetchBoatData() {
         const response = await fetch('/api/boat');
         monthlyBoatData = await response.json();
         const totals = calculateTotals(monthlyBoatData);
+//        console.log('Calculated totals:', totals);
         updateInfoBox(totals);
     } catch (error) {
         console.error('Error fetching boat data:', error);
@@ -86,15 +87,18 @@ function initializePage() {
 function updateSelection(arrivingShips, departingShips) {
     selectedArriving = arrivingShips.getLayers().length > 0;
     selectedDeparting = departingShips.getLayers().length > 0;
-    updateInfoBox();
+    updateSelection(arrivingShips, departingShips);  // Update selection state only
 }
 
 function updateInfoBox(totals = { arriving: { Container: 0, "Dry Bulk": 0, Passenger: 0 }, departing: { Container: 0, "Dry Bulk": 0, Passenger: 0 } }) {
+//    console.log('Updating info box', totals);
+
     const finalTotals = {
         Container: totals.arriving.Container + totals.departing.Container,
         "Dry Bulk": totals.arriving["Dry Bulk"] + totals.departing["Dry Bulk"],
         Passenger: totals.arriving.Passenger + totals.departing.Passenger
     };
+//    console.log('Final totals for animation:', finalTotals);
 
     const duration = 6300; // Duration of the animation in milliseconds
     const frameRate = 120; // Frames per second

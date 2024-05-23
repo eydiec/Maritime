@@ -10,11 +10,13 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 
 s3_client = boto3.client('s3')
 # InfluxDB settings
-url = 'http://ec2-13-237-180-170.ap-southeast-2.compute.amazonaws.com:8086'
-token = 'cIYhKpr886pTMDnHjYfUu8xqG-stTK7XIqmKyBP3Q3uyFw3NSrAMpyyTRX34e3hcOPpG6uMGlsRJk0z4nteCoA=='
-org = 'appworks'
-influx_bucket = 'personal_project'
 
+
+
+url = os.getenv('INFLUX_URL')
+org = os.getenv('INFLUX_ORG')
+token = os.getenv('INFLUX_TOKEN')
+influx_bucket = os.getenv('INFLUX_BUCKET')
 
 def lambda_handler(event, context):
     s3_bucket = event['Records'][0]['s3']['bucket']['name']
@@ -97,7 +99,6 @@ def lambda_handler(event, context):
                 except ValueError as e:
                     print(f"Error processing row {reader.line_num}: {e}")
 
-            # write_api.write(bucket=influx_bucket, record=point)
 
         write_api.close()
 

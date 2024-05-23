@@ -25,12 +25,12 @@ def test_query_data(MockInfluxDBClient):
     mock_query_api = MockInfluxDBClient.return_value.query_api.return_value
     handler = InfluxDataHandler()
     query = "dummy_query"
-    handler.query_data(query)
+    handler.query_data(query) # call query_data, use the mocked query_api.query method
     mock_query_api.query.assert_called_with(query)
 
 
-@patch('analyze.InfluxDBClient')
-def test_process_results(MockInfluxDBClient):
+
+def test_process_results():
     handler = InfluxDataHandler()
     mock_result = [MagicMock()]
     mock_record = MagicMock()
@@ -39,7 +39,7 @@ def test_process_results(MockInfluxDBClient):
     mock_result[0].records = [mock_record]
     df = handler.process_results(mock_result)
     expected_df = pd.DataFrame({'_value': [100]}, index=pd.to_datetime(['2024-01-01']).tz_localize('UTC'))
-    expected_df.index.name = '_time'  # Ensure index name matches
+    expected_df.index.name = '_time'  # ensure index name matches
     pd.testing.assert_frame_equal(df, expected_df.resample('M').sum())
 
 
@@ -57,8 +57,7 @@ def test_plot_data():
 @patch('analyze.base64')
 def test_save_plot(mock_base64, mock_bytes_io):
     mock_base64.b64encode.return_value.decode.return_value = 'encoded_string'
-    mock_bytes_io_instance = BytesIO()
-    mock_bytes_io.return_value = mock_bytes_io_instance
+    mock_bytes_io.return_value = BytesIO()
 
     plotter = DataPlotter()
     plt.figure()

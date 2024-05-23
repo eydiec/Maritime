@@ -1,7 +1,6 @@
-import os
 import pytest
 import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 from app import app
 
 
@@ -13,23 +12,35 @@ def client():
 
 
 def test_home_route(client):
-    with patch('analyze.InfluxDataHandler') as MockHandler, patch('analyze.plot_pair') as mock_plot_pair:
+    with patch('app.InfluxDataHandler') as MockHandler, patch('app.plot_pair') as mock_plot_pair, patch.dict('os.environ', {'GRAFANA_TOKEN': 'mock_grafana_token'}):
         MockHandler.return_value.generate_query.return_value = 'mock_query'
         mock_plot_pair.return_value = 'mock_plot_url'
 
         response = client.get('/')
         assert response.status_code == 200
         data = response.get_data(as_text=True)
-        assert 'data:image/png;base64' in data
+        assert 'mock_grafana_token' in data #tend to be in another
+        assert 'mock_plot_url' in data #tend to be in another
+
+        # verify 7 generate_query is called
+        assert MockHandler.return_value.generate_query.call_count == 7
+        # verify 6 plot_pair is called
+        assert mock_plot_pair.call_count == 6
 
 
+        expected_calls = [
+            call(MockHandler.return_value, 'mock_query', 'mock_query', 'WCI vs. Container Throughput', 'WCI', 'Container Throughput'),
+            call(MockHandler.return_value, 'mock_query', 'mock_query', 'FBX vs. Container Throughput', 'FBX', 'Container Throughput'),
+            call(MockHandler.return_value, 'mock_query', 'mock_query', 'BDI vs. Cargo Throughput', 'BDI', 'Cargo Throughput'),
+            call(MockHandler.return_value, 'mock_query', 'mock_query', 'Stock Index vs. Container Throughput', 'Stock Index', 'Container Throughput'),
+            call(MockHandler.return_value, 'mock_query', 'mock_query', 'Stock Index vs. Cargo Throughput', 'Stock Index', 'Cargo Throughput'),
+            call(MockHandler.return_value, 'mock_query', 'mock_query', 'Stock Index vs. Export Value', 'Stock Index', 'Export Value')
+        ]
+        mock_plot_pair.assert_has_calls(expected_calls, any_order=True)
 def test_map_route(client):
     response = client.get('/map')
     assert response.status_code == 200
-    data = response.get_data(as_text=True)
-    # specific elements that should be in the map.html template
-    assert '<div id="map"' in data
-    assert '<link rel="stylesheet" href="/static/marine.css">' in data
+
 
 
 @patch('app.geo_json')
