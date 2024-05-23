@@ -6,7 +6,7 @@
 A comprehensive platform providing daily port information and detailed market trend analytics from international indexes. The platform features an animated map built with Leaflet to visualize data over a rolling 12-month period.
 
 ## Features
-***
+
 - **Port Information**: 
   - Daily port congestion updates, on-berth ships
   - International indexes: WCI, FBX, BDI (weekly updates)
@@ -16,7 +16,7 @@ A comprehensive platform providing daily port information and detailed market tr
 - **Animated Map**: Visualize data trends over 12 months using a dynamic map.
 
 ## Technologies Used
-***
+
 - **Frontend**: Leaflet for interactive map visualization
 - **Backend**: AWS Lambda, Flask, Docker
 - **Data Storage**: Amazon S3, InfluxDB
