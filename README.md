@@ -63,7 +63,6 @@ Through this endeavor, I honor his memory and his enduring influence on my life.
 ### Port Daily Update 
 ![Port Daily Update](readme-img/port.png)(captured on May 23, 2024)
 ### Port Operation Update
-![Port Operation Update](readme-img/operation.gif)
 <img src="readme-img/operation.gif" alt="Port Operation Update" width="800"/>
 ### International Indexes 
 ![International Indexes](readme-img/index.png)
