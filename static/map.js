@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     await fetchBoatData();
     renderMonths();
     setupMap();
-
 });
 
 let monthlyBoatData = {};
@@ -11,8 +10,8 @@ async function fetchBoatData() {
     try {
         const response = await fetch('/api/boat');
         monthlyBoatData = await response.json();
+        console.log('Fetched boat data:', monthlyBoatData); // Add this line
         const totals = calculateTotals(monthlyBoatData);
-//        console.log('Calculated totals:', totals);
         updateInfoBox(totals);
     } catch (error) {
         console.error('Error fetching boat data:', error);
@@ -21,11 +20,6 @@ async function fetchBoatData() {
 
 function calculateTotals(data) {
     return {
-        arriving: {
-            Container: sumByKey(data.arriving, 'Container'),
-            "Dry Bulk": sumByKey(data.arriving, 'Dry Bulk'),
-            Passenger: sumByKey(data.arriving, 'Passenger')
-        },
         departing: {
             Container: sumByKey(data.departing, 'Container'),
             "Dry Bulk": sumByKey(data.departing, 'Dry Bulk'),
@@ -73,34 +67,14 @@ function formatMonth(month) {
     return `${year}-${monthNumber}-01`;
 }
 
-function initializePage() {
-    selectedArriving = true;
-    selectedDeparting = true;
-
-    const arrivingShips = { getLayers: () => selectedArriving ? [{}] : [] };
-    const departingShips = { getLayers: () => selectedDeparting ? [{}] : [] };
-
-    updateSelection(arrivingShips, departingShips);
-    updateInfoBox();
-}
-
-function updateSelection(arrivingShips, departingShips) {
-    selectedArriving = arrivingShips.getLayers().length > 0;
-    selectedDeparting = departingShips.getLayers().length > 0;
-    updateSelection(arrivingShips, departingShips);  // Update selection state only
-}
-
-function updateInfoBox(totals = { arriving: { Container: 0, "Dry Bulk": 0, Passenger: 0 }, departing: { Container: 0, "Dry Bulk": 0, Passenger: 0 } }) {
-//    console.log('Updating info box', totals);
-
+function updateInfoBox(totals = { departing: { Container: 0, "Dry Bulk": 0, Passenger: 0 } }) {
     const finalTotals = {
-        Container: totals.arriving.Container + totals.departing.Container,
-        "Dry Bulk": totals.arriving["Dry Bulk"] + totals.departing["Dry Bulk"],
-        Passenger: totals.arriving.Passenger + totals.departing.Passenger
+        Container: totals.departing.Container,
+        "Dry Bulk": totals.departing["Dry Bulk"],
+        Passenger: totals.departing.Passenger
     };
-//    console.log('Final totals for animation:', finalTotals);
 
-    const duration = 6300; // Duration of the animation in milliseconds
+    const duration = 8000; // Duration of the animation in milliseconds
     const frameRate = 120; // Frames per second
     const frames = duration / (1000 / frameRate);
     let currentFrame = 0;
@@ -135,25 +109,15 @@ function showTooltip(index) {
     const tooltip = document.getElementById('tooltip');
     const monthItem = document.querySelector(`.month-item[data-index="${index}"]`);
     const selectedMonth = monthItem.dataset.month;
-    const formattedMonth = formatMonth(selectedMonth);
 
     let containerCount = 0;
     let dryBulkCount = 0;
     let passengerCount = 0;
 
-    if (selectedArriving) {
-        const arrivingData = monthlyBoatData.arriving?.[selectedMonth] || {};
-        containerCount += arrivingData.Container || 7630;
-        dryBulkCount += arrivingData["Dry Bulk"] || 3620;
-        passengerCount += arrivingData.Passenger || 380;
-    }
-
-    if (selectedDeparting) {
-        const departingData = monthlyBoatData.departing?.[selectedMonth] || {};
-        containerCount += departingData.Container || 1;
-        dryBulkCount += departingData["Dry Bulk"] || 2;
-        passengerCount += departingData.Passenger || 3;
-    }
+    const departingData = monthlyBoatData.departing?.[selectedMonth] || {};
+    containerCount += departingData.Container || 3931;
+    dryBulkCount += departingData["Dry Bulk"] || 1722;
+    passengerCount += departingData.Passenger || 193;
 
     const tooltipContent = `
         <p class="tooltip-text">貨櫃船: ${containerCount}</p>
@@ -197,19 +161,7 @@ function setupMap() {
         maxZoom: 20
     }).addTo(map);
 
-    const arrivingShips = L.featureGroup().addTo(map);
     const departingShips = L.featureGroup().addTo(map);
-
-    const layerControl = L.control.layers(null, {
-        '進港船舶': arrivingShips,
-        '出港船舶': departingShips
-    }, {
-        collapsed: false
-    }).addTo(map);
-
-    layerControl.getContainer().addEventListener('change', function () {
-        updateSelection(arrivingShips, departingShips);
-    });
 
     const portCoordinates = {
         "TWKHH": [22.6178, 120.3067],
@@ -219,10 +171,10 @@ function setupMap() {
     };
 
     const months = get12Months();
-    animateShipsByMonths(months, arrivingShips, departingShips, portCoordinates, map);
+    animateShipsByMonths(months, departingShips, portCoordinates, map);
 }
 
-function animateShipsByMonths(months, arrivingShips, departingShips, portCoordinates, map) {
+function animateShipsByMonths(months, departingShips, portCoordinates, map) {
     let currentMonthIndex = 0;
 
     function animateCurrentMonth() {
@@ -231,7 +183,6 @@ function animateShipsByMonths(months, arrivingShips, departingShips, portCoordin
         fetch(`/api/port?month=${months[currentMonthIndex]}`)
             .then(response => response.json())
             .then(data => {
-                arrivingShips.clearLayers();
                 departingShips.clearLayers();
 
                 data.features.forEach(feature => {
@@ -239,24 +190,26 @@ function animateShipsByMonths(months, arrivingShips, departingShips, portCoordin
                     const geoCoords = feature.geometry.coordinates;
                     let startLatLng, endLatLng;
 
-                    if (props.status === 'arriving') {
-                        startLatLng = L.latLng(geoCoords[1], geoCoords[0]);
-                        endLatLng = L.latLng(...portCoordinates[props.end_port]);
-                    } else {
+                    if (portCoordinates[props.start_port] && geoCoords) {
                         startLatLng = L.latLng(...portCoordinates[props.start_port]);
                         endLatLng = L.latLng(geoCoords[1], geoCoords[0]);
-                    }
 
-                    L.Marker.movingMarker([startLatLng, endLatLng], [6000], {
-                        autostart: true,
-                        loop: false,
-                        icon: L.divIcon({
-                            className: 'custom-div-icon',
-                            html: "<div style='background-color:red;'></div>",
-                            iconSize: [3, 3],
-                            iconAnchor: [1.5, 1.5]
-                        })
-                    }).addTo(props.status === 'arriving' ? arrivingShips : departingShips);
+
+                        const movingMarker = L.Marker.movingMarker([startLatLng, endLatLng], [6000], {
+                            autostart: true,
+                            loop: false,
+                            icon: L.divIcon({
+                                className: 'custom-div-icon',
+                                html: "<div style='background-color:red;'></div>",
+                                iconSize: [3, 3],
+                                iconAnchor: [1.5, 1.5]
+                            })
+                        });
+
+
+
+                        movingMarker.addTo(departingShips);
+                    }
                 });
 
                 currentMonthIndex++;
@@ -264,16 +217,15 @@ function animateShipsByMonths(months, arrivingShips, departingShips, portCoordin
                     setTimeout(animateCurrentMonth, 6000); // Pause between months
                 }
             })
-            .catch(e => console.error(e));
+            .catch(e => console.error('Error fetching port data:', e));
     }
 
     startMonthIndicatorAnimation(62000);
-    arrivingShips.addTo(map);
     departingShips.addTo(map);
     animateCurrentMonth();
 }
 
-// Start the month indicator animation
+
 function startMonthIndicatorAnimation(duration) {
     const indicator = document.querySelector('.month-indicator');
     const monthItems = document.querySelectorAll('.timeline li');
@@ -308,3 +260,4 @@ function startMonthIndicatorAnimation(duration) {
     }
     requestAnimationFrame(updatePosition);
 }
+
